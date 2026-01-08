@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10, <3.14"
 resolution-markers = [
     "python_full_version >= '3.13' and platform_machine == 'arm64' and sys_platform == 'darwin'",
@@ -5542,7 +5542,7 @@ wheels = [
 
 [[package]]
 name = "langflow"
-version = "1.7.2"
+version = "1.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "ag-ui-protocol" },
@@ -5949,7 +5949,7 @@ dev = [
 
 [[package]]
 name = "langflow-base"
-version = "0.7.2"
+version = "0.8.0"
 source = { editable = "src/backend/base" }
 dependencies = [
     { name = "aiofile" },
@@ -6408,7 +6408,7 @@ wheels = [
 
 [[package]]
 name = "lfx"
-version = "0.2.1"
+version = "0.3.0"
 source = { editable = "src/lfx" }
 dependencies = [
     { name = "ag-ui-protocol" },
