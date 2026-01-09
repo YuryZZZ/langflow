@@ -490,9 +490,11 @@ class PublishFlowCreate(BaseModel):
 
 class PublishedFlowRead(PublishedFlowMetadata):
     """Schema for reading a published flow, includes the composite key fields."""
+
     model_config = ConfigDict(extra="ignore")
 
 
 class MessageResponse(BaseModel):
     """Simple response schema for generic messages."""
+
     message: str

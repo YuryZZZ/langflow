@@ -11,12 +11,10 @@ if TYPE_CHECKING:
     from langflow.services.settings.service import SettingsService
 
 
-
 class PublishService(Service):
     name = "publish_service"
 
     def __init__(self, settings_service: SettingsService):
-
         self.settings_service = settings_service
 
         self.prefix = settings_service.settings.publish_backend_prefix
@@ -35,7 +33,7 @@ class PublishService(Service):
         user_id: IDType,
         flow_id: IDType,
         key: PublishedFlowMetadata,
-        ) -> str:
+    ) -> str:
         """Retrieves a published flow from the storage provider."""
         raise NotImplementedError
 
@@ -46,7 +44,7 @@ class PublishService(Service):
         flow_id: IDType,
         flow_blob: dict,
         publish_tag: str | None,
-        ) -> PublishedFlowMetadata:
+    ) -> PublishedFlowMetadata:
         """Publishes a flow to the storage provider."""
         raise NotImplementedError
 
@@ -56,7 +54,7 @@ class PublishService(Service):
         user_id: IDType,
         flow_id: IDType,
         key: PublishedFlowMetadata,
-        ) -> str | None:
+    ) -> str | None:
         """Deletes a published flow from the storage provider."""
         raise NotImplementedError
 
@@ -65,6 +63,6 @@ class PublishService(Service):
         self,
         user_id: IDType,
         flow_id: IDType,
-        ) -> list[PublishedFlowMetadata] | None:
+    ) -> list[PublishedFlowMetadata] | None:
         """List published versions of the given flow."""
         raise NotImplementedError

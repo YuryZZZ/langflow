@@ -1,4 +1,3 @@
-
 import hashlib
 import re
 from copy import deepcopy
@@ -33,7 +32,9 @@ def add_trailing_slash(s):
 ########################################################
 # sanitization and parsing of the object key
 ########################################################
-ALNUM_PATTERN = re.compile(r"[^a-zA-Z0-9_.-]+") # Allowed: a-z, A-Z, 0-9, _, ., -
+ALNUM_PATTERN = re.compile(r"[^a-zA-Z0-9_.-]+")  # Allowed: a-z, A-Z, 0-9, _, ., -
+
+
 def to_alnum_string(s: str | None):
     """Returns a new string with invalid characters removed.
 
@@ -43,6 +44,8 @@ def to_alnum_string(s: str | None):
 
 
 KEY_VAL_PATTERN = re.compile(r"([^/]+)=([^/]+)")
+
+
 def parse_flow_key(key: str, last_modified: datetime | None) -> PublishedFlowMetadata:
     """Matches key-value pairs in an s3 object key to return a PublishedFlowMetadata object."""
     data = dict(KEY_VAL_PATTERN.findall(key))
@@ -73,11 +76,7 @@ def require_bucket_name(bucket_name: str | None):
         raise ValueError(MISSING_BUCKET_NAME_MSG)
 
 
-def require_all_ids(
-    user_id: IDType,
-    item_id: IDType,
-    item_type: str
-    ):
+def require_all_ids(user_id: IDType, item_id: IDType, item_type: str):
     """Raises a ValueError if the user or item id is None or empty."""
     if not (user_id and item_id):
         raise ValueError(MISSING_ALL_ID_MSG.format(item_type=item_type))
@@ -106,12 +105,7 @@ def require_valid_flow(flow_data: dict | None):
 
     flow_data["name"] = to_alnum_string(flow_data.get("name", None))
 
-    if not (
-        flow_data["name"] and
-        "description" in flow_data and
-        "nodes" in flow_data and
-        "edges" in flow_data
-        ):
+    if not (flow_data["name"] and "description" in flow_data and "nodes" in flow_data and "edges" in flow_data):
         raise ValueError(INVALID_FLOW_MSG)
 
 
@@ -120,7 +114,7 @@ def validate_all(
     user_id: IDType,
     item_id: IDType,
     item_type: str,
-    ):
+):
     """Validate all required parameters for publish operations.
 
     Args:
@@ -149,35 +143,35 @@ EXCLUDE_NODE_KEYS = {
     "resizing",
     "width",
     "height",
-    ("data", "node", "last_updated"), # nested
-    ("data", "node", "lf_version"), # should we update starter projects?
+    ("data", "node", "last_updated"),  # nested
+    ("data", "node", "lf_version"),  # should we update starter projects?
     ("data", "node", "outputs", "hidden"),
-    }
+}
 EXCLUDE_EDGE_KEYS = {
     "id",
     "selected",
     "animated",
     "className",
     "style",
-    }
+}
 
 
 def normalized_flow_data(flow_data: dict | None):
     """Filters a deepcopy of flow data to exclude transient state."""
-    copy_flow_data = deepcopy(flow_data) # prevent modifying blob
+    copy_flow_data = deepcopy(flow_data)  # prevent modifying blob
     if copy_flow_data:
         try:
             copy_flow_data.pop("viewport", None)
             copy_flow_data.pop("chatHistory", None)
             remove_keys_from_dicts(copy_flow_data["nodes"], EXCLUDE_NODE_KEYS)
             remove_keys_from_dicts(copy_flow_data["edges"], EXCLUDE_EDGE_KEYS)
-        except Exception as e: # noqa: BLE001
+        except Exception as e:  # noqa: BLE001
             logger.error(f"failed to filter flow contents: {e!s}")
             # don't want to block publishing, so nothing gets raised here
     return copy_flow_data
 
 
-def remove_keys_from_dicts(dictlist : list[dict], exclude_keys : set):
+def remove_keys_from_dicts(dictlist: list[dict], exclude_keys: set):
     """Remove a set of keys from each dictionary in a list in-place."""
     for d in dictlist:
         for key in exclude_keys:
@@ -189,13 +183,13 @@ def remove_keys_from_dicts(dictlist : list[dict], exclude_keys : set):
 
 def pop_nested(d: dict, keys: tuple):
     """Removes the nested keys from the dictionary."""
-    cur = d # walk down until second last key
+    cur = d  # walk down until second last key
     for i in range(len(keys) - 1):
         cur = cur.get(keys[i], {})
-    if isinstance(cur, list): # last key is in a list of dicts
+    if isinstance(cur, list):  # last key is in a list of dicts
         for _d in cur:
             _d.pop(keys[-1], None)
-    else: # dict
+    else:  # dict
         cur.pop(keys[-1], None)
 
 
@@ -269,12 +263,10 @@ def handle_s3_error(e: Exception, resource_name: str = "flow", op: str = "get"):
     if isinstance(e, (BotoConnectionError, NoCredentialsError)):
         logger.error(f"S3 connection error: {e}")
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Could not connect to storage service."
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Could not connect to storage service."
         )
 
     logger.error(f"Unexpected S3 error: {e}")
     raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail=f"An unexpected error occurred: {e!s}"
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An unexpected error occurred: {e!s}"
     )

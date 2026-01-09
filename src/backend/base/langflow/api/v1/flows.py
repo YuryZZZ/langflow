@@ -699,11 +699,7 @@ async def read_basic_examples(
 ########################################################
 # Publish Flow endpoints
 ########################################################
-@router.post(
-    "/{flow_id}/publish/",
-    response_model=PublishedFlowRead | MessageResponse,
-    status_code=201
-    )
+@router.post("/{flow_id}/publish/", response_model=PublishedFlowRead | MessageResponse, status_code=201)
 async def publish_flow(
     *,
     session: DbSession,
@@ -721,10 +717,7 @@ async def publish_flow(
 
         publish_service: PublishService = get_service(ServiceType.PUBLISH_SERVICE)
         publish_data: PublishedFlowMetadata = await publish_service.put_flow(
-            user_id=current_user.id,
-            flow_id=db_flow.id,
-            flow_blob=flow_blob,
-            publish_tag=publish_tag
+            user_id=current_user.id, flow_id=db_flow.id, flow_blob=flow_blob, publish_tag=publish_tag
         )
     except HTTPException:
         raise
@@ -740,7 +733,7 @@ async def list_published_flows(
     *,
     flow_id: UUID,
     current_user: CurrentActiveUser,
-    ):
+):
     """List all published versions of the flow."""
     require_all_ids(current_user.id, flow_id, "flow")
     try:
@@ -748,7 +741,7 @@ async def list_published_flows(
         flow_data_list = await publish_service.list_flow_versions(
             user_id=current_user.id,
             flow_id=flow_id,
-            )
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -764,7 +757,7 @@ async def read_published_flow(
     current_user: CurrentActiveUser,
     version_id: str,
     flow_name: str,
-    ):
+):
     """Retrieve a specific published flow version."""
     require_all_ids(current_user.id, flow_id, "flow")
     try:
@@ -774,7 +767,7 @@ async def read_published_flow(
             user_id=current_user.id,
             flow_id=flow_id,
             key=key,
-            )
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -790,7 +783,7 @@ async def delete_published_flow(
     current_user: CurrentActiveUser,
     version_id: str,
     flow_name: str,
-    ):
+):
     """Delete a specific published flow version."""
     require_all_ids(current_user.id, flow_id, "flow")
 
@@ -801,7 +794,7 @@ async def delete_published_flow(
             user_id=current_user.id,
             flow_id=flow_id,
             key=key,
-            )
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -814,7 +807,7 @@ async def _read_flow_for_publish(
     session: AsyncSession,
     flow_id: UUID,
     user_id: UUID,
-    ) -> Flow | None:
+) -> Flow | None:
     """Read a flow from flow_id and user_id.
 
     Raises an HTTP exception if not found or Flow.data is None or empty.

@@ -497,24 +497,14 @@ async def get_published_flow(
         publish_service: PublishService = get_service(ServiceType.PUBLISH_SERVICE)
 
         # 1. Verify existence and get metadata
-        versions = await publish_service.list_flow_versions(
-            user_id=api_key_user.id,
-            flow_id=flow_id
-        )
+        versions = await publish_service.list_flow_versions(user_id=api_key_user.id, flow_id=flow_id)
         target_version = next((v for v in versions if v.version_id == version_id), None)
 
         if not target_version:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Published version {version_id} not found for flow {flow_id}"
-            )
+            raise HTTPException(status_code=404, detail=f"Published version {version_id} not found for flow {flow_id}")
 
         # 2. Fetch content
-        flow_data_str = await publish_service.get_flow(
-            user_id=api_key_user.id,
-            flow_id=flow_id,
-            key=target_version
-        )
+        flow_data_str = await publish_service.get_flow(user_id=api_key_user.id, flow_id=flow_id, key=target_version)
 
         if not flow_data_str:
             raise HTTPException(status_code=404, detail="Flow data not found")
@@ -528,9 +518,9 @@ async def get_published_flow(
             name=target_version.flow_name,
             description=flow_data.get("description"),
             data=flow_data,
-            folder_id=None, # Published flows don't really have a folder context
+            folder_id=None,  # Published flows don't really have a folder context
         )
-    except Exception as exc: # TODO: fix this garbage
+    except Exception as exc:  # TODO: fix this garbage
         if isinstance(exc, HTTPException):
             raise exc from exc
         raise HTTPException(status_code=500, detail=str(exc)) from exc
