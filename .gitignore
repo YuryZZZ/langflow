@@ -290,3 +290,10 @@ member_servers.json
 # data files used for desktop registration
 data/user
 
+
+# MCP Codebase Map files
+.codebase-map.lock
+.codebase-map.db
+.codebase-map.db-shm
+.codebase-map.db-wal
+.codebase-map.json

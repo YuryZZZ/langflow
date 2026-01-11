@@ -1,0 +1,74 @@
+services:
+  # A Docker web service with MCP integration
+  - type: web
+    name: langflow-mcp
+    runtime: docker
+    dockerfilePath: ./docker/build_and_push_mcp.Dockerfile
+    repo: https://github.com/langflow-ai/langflow
+    branch: feature/langflow-env-setup
+    plan: standard
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: LANGFLOW_DATABASE_URL
+        value: sqlite:////app/data/.cache/langflow/langflow.db
+      - key: LANGFLOW_HOST
+        value: 0.0.0.0
+      - key: LANGFLOW_PORT
+        # default render port https://docs.render.com/web-services#port-binding
+        value: 10000
+      - key: LANGFLOW_LOG_LEVEL
+        value: INFO
+      # MCP Configuration
+      - key: OPENCODE_CONFIG_DIR
+        value: /app/.opencode
+      - key: OPENCODE_AI_DIR
+        value: /app/.ai
+      - key: OPENCODE_SCRIPTS_DIR
+        value: /app/scripts
+      # PostgreSQL for TaskBus (if using external database)
+      - key: POSTGRES_HOST
+        value: localhost
+      - key: POSTGRES_PORT
+        value: 5432
+      - key: POSTGRES_DB
+        value: opencode_taskbus
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+      # API Keys (should be set in Render dashboard)
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: ZAI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PERPLEXITY_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+    disk:
+      name: langflow-mcp-data
+      mountPath: /app/data
+    # Add PostgreSQL database for TaskBus
+    databases:
+      - name: opencode_taskbus
+        databaseName: opencode_taskbus
+        user: postgres
+        plan: free
+
+# Add a PostgreSQL database for TaskBus
+databases:
+  - name: opencode_taskbus
+    databaseName: opencode_taskbus
+    plan: free
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
