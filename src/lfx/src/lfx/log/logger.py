@@ -317,6 +317,7 @@ def configure(
     if log_file:
         if not log_file.parent.exists():
             cache_dir = Path(user_cache_dir("langflow"))
+            cache_dir.mkdir(parents=True, exist_ok=True)
             log_file = cache_dir / "langflow.log"
 
         # Parse rotation settings
