@@ -1,52 +1,20 @@
 from .model_metadata import create_model_metadata
 
 # Unified model metadata - single source of truth
+# Updated to approved models list 2026-01-17
 OPENAI_MODELS_DETAILED = [
-    # Regular OpenAI Models
-    create_model_metadata(provider="OpenAI", name="gpt-4o-mini", icon="OpenAI", tool_calling=True),
-    create_model_metadata(provider="OpenAI", name="gpt-4o", icon="OpenAI", tool_calling=True),
-    create_model_metadata(provider="OpenAI", name="gpt-4.1", icon="OpenAI", tool_calling=True),
-    create_model_metadata(provider="OpenAI", name="gpt-4.1-mini", icon="OpenAI", tool_calling=True),
-    create_model_metadata(provider="OpenAI", name="gpt-4.1-nano", icon="OpenAI", tool_calling=True),
-    create_model_metadata(provider="OpenAI", name="gpt-4.5-preview", icon="OpenAI", tool_calling=True, preview=True),
-    create_model_metadata(provider="OpenAI", name="gpt-4-turbo", icon="OpenAI", tool_calling=True),
-    create_model_metadata(
-        provider="OpenAI", name="gpt-4-turbo-preview", icon="OpenAI", tool_calling=True, preview=True
-    ),
-    create_model_metadata(provider="OpenAI", name="gpt-4", icon="OpenAI", tool_calling=True),
-    create_model_metadata(provider="OpenAI", name="gpt-3.5-turbo", icon="OpenAI", tool_calling=True),
-    # Reasoning Models
-    create_model_metadata(provider="OpenAI", name="o1", icon="OpenAI", reasoning=True),
-    # Search Models
-    create_model_metadata(
-        provider="OpenAI",
-        name="gpt-4o-mini-search-preview",
-        icon="OpenAI",
-        tool_calling=True,
-        search=True,
-        preview=True,
-    ),
-    create_model_metadata(
-        provider="OpenAI", name="gpt-4o-search-preview", icon="OpenAI", tool_calling=True, search=True, preview=True
-    ),
-    # Not Supported Models
-    create_model_metadata(
-        provider="OpenAI", name="computer-use-preview", icon="OpenAI", not_supported=True, preview=True
-    ),
-    create_model_metadata(
-        provider="OpenAI", name="gpt-4o-audio-preview", icon="OpenAI", not_supported=True, preview=True
-    ),
-    create_model_metadata(
-        provider="OpenAI", name="gpt-4o-realtime-preview", icon="OpenAI", not_supported=True, preview=True
-    ),
-    create_model_metadata(
-        provider="OpenAI", name="gpt-4o-mini-audio-preview", icon="OpenAI", not_supported=True, preview=True
-    ),
-    create_model_metadata(
-        provider="OpenAI", name="gpt-4o-mini-realtime-preview", icon="OpenAI", not_supported=True, preview=True
-    ),
-    create_model_metadata(provider="OpenAI", name="o3-mini", icon="OpenAI", reasoning=True, not_supported=True),
-    create_model_metadata(provider="OpenAI", name="o1-mini", icon="OpenAI", reasoning=True, not_supported=True),
+    # GPT-5 Series (Approved)
+    create_model_metadata(provider="OpenAI", name="gpt-5.2", icon="OpenAI", tool_calling=True),
+    create_model_metadata(provider="OpenAI", name="gpt-5.2-chat-latest", icon="OpenAI", tool_calling=True),
+    create_model_metadata(provider="OpenAI", name="gpt-5.1", icon="OpenAI", tool_calling=True),
+    # Legacy Models (kept for backwards compatibility)
+    create_model_metadata(provider="OpenAI", name="gpt-4o-mini", icon="OpenAI", tool_calling=True, deprecated=True),
+    create_model_metadata(provider="OpenAI", name="gpt-4o", icon="OpenAI", tool_calling=True, deprecated=True),
+    create_model_metadata(provider="OpenAI", name="gpt-4-turbo", icon="OpenAI", tool_calling=True, deprecated=True),
+    create_model_metadata(provider="OpenAI", name="gpt-4", icon="OpenAI", tool_calling=True, deprecated=True),
+    create_model_metadata(provider="OpenAI", name="gpt-3.5-turbo", icon="OpenAI", tool_calling=True, deprecated=True),
+    # Reasoning Models (legacy)
+    create_model_metadata(provider="OpenAI", name="o1", icon="OpenAI", reasoning=True, deprecated=True),
 ]
 
 OPENAI_MODEL_NAMES = [
@@ -55,12 +23,13 @@ OPENAI_MODEL_NAMES = [
     if not metadata.get("reasoning", False)
     and not metadata.get("search", False)
     and not metadata.get("not_supported", False)
+    and not metadata.get("deprecated", False)
 ]
 
 OPENAI_REASONING_MODEL_NAMES = [
     metadata["name"]
     for metadata in OPENAI_MODELS_DETAILED
-    if metadata.get("reasoning", False) and not metadata.get("not_supported", False)
+    if metadata.get("reasoning", False) and not metadata.get("not_supported", False) and not metadata.get("deprecated", False)
 ]
 
 OPENAI_SEARCH_MODEL_NAMES = [
