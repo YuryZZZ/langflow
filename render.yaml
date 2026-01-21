@@ -4,8 +4,8 @@ services:
     name: langflow
     runtime: docker
     dockerfilePath: ./docker/render.Dockerfile
-    repo: https://github.com/langflow-ai/langflow
-    branch: main
+    repo: https://github.com/YuryZZZ/langflow
+    branch: clever-poincare
     plan: standard
     healthCheckPath: /health_check
     autoDeploy: false
