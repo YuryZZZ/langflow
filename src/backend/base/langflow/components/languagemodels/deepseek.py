@@ -7,7 +7,7 @@ from langflow.field_typing import LanguageModel
 from langflow.field_typing.range_spec import RangeSpec
 from langflow.inputs.inputs import BoolInput, DictInput, DropdownInput, IntInput, SecretStrInput, SliderInput, StrInput
 
-DEEPSEEK_MODELS = ["deepseek-chat", "deepseek-reasoner"]
+DEEPSEEK_MODELS = ["deepseek-chat"]
 
 
 class DeepSeekModelComponent(LCModelComponent):
