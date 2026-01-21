@@ -315,7 +315,11 @@ def configure(
 
     # Set up file logging if needed
     if log_file:
-        if not log_file.parent.exists():
+        # Try to create the log file's parent directory
+        try:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError):
+            # Fallback to user cache directory if we can't create the requested path
             cache_dir = Path(user_cache_dir("langflow"))
             cache_dir.mkdir(parents=True, exist_ok=True)
             log_file = cache_dir / "langflow.log"
