@@ -320,10 +320,16 @@ def configure(
             log_file.parent.mkdir(parents=True, exist_ok=True)
         except (PermissionError, OSError):
             # Fallback to user cache directory if we can't create the requested path
-            cache_dir = Path(user_cache_dir("langflow"))
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            log_file = cache_dir / "langflow.log"
+            try:
+                cache_dir = Path(user_cache_dir("langflow"))
+                cache_dir.mkdir(parents=True, exist_ok=True)
+                log_file = cache_dir / "langflow.log"
+            except (PermissionError, OSError):
+                # If even the cache directory fails, skip file logging entirely
+                log_file = None
 
+    # Only set up file handler if we have a valid log_file path
+    if log_file:
         # Parse rotation settings
         if log_rotation:
             # Handle rotation like "1 day", "100 MB", etc.
