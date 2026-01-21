@@ -560,7 +560,7 @@ Before writing code:
         "model": "glm-4.7",
         "display_name": "M5 Creative Ideator",
         "temperature": 0.9,  # HIGH for creativity
-        "max_tokens": 32768,  # GLM-4.7 supports 128K output
+        "max_tokens": 65536,  # GLM-4.7 supports 128K output, use 64K for creative generation
         "system_prompt": """You are M5 (Creative Ideator), the innovation and exploration specialist.
 
 ## COGNITIVE FRAMEWORK

@@ -93,11 +93,11 @@ MODEL_SPECS = {
         "provider": "google"
     },
 
-    # GLM-4.7 - 200K context, 128K output
+    # GLM-4.7 - 200K context, 128K output (very large output capacity)
     "glm-4.7": {
         "context_window": 200000,
         "max_output": 128000,
-        "recommended_output": 32768,
+        "recommended_output": 65536,  # Use 64K for creative tasks
         "provider": "zai"
     },
 
