@@ -370,12 +370,15 @@ For each claim or fact:
 - Flag contradictory findings explicitly"""
     },
 
+    # M3: Systems Architect - GPT-5.2 (400K context, 128K output)
+    # Role: Architecture needs structured design thinking
+    # Temperature: 0.4 (balanced creativity + structure)
     AgentRole.ARCHITECT: {
-        "provider": "anthropic",
-        "model": "claude-opus-4-5-20251101",
+        "provider": "openai",
+        "model": "gpt-5.2",
         "display_name": "M3 Systems Architect",
         "temperature": 0.4,
-        "max_tokens": 8192,
+        "max_tokens": 32768,  # GPT-5.2 supports 128K
         "system_prompt": """You are M3 (Systems Architect), the technical design authority.
 
 ## COGNITIVE FRAMEWORK
@@ -733,15 +736,15 @@ For each claim or artifact:
 - Validate code can actually run"""
     },
 
-    # M7: Critical Analyst - Claude Opus 4.5 (200K context, 64K output)
-    # Role: Red-teaming needs balanced skepticism + creativity to find issues
+    # M7: Critical Analyst - DeepSeek Chat (128K context, 32K output)
+    # Role: Red-teaming needs skepticism + diverse perspective
     # Temperature: 0.6 (MEDIUM-HIGH - find diverse problems)
     AgentRole.CRITIC: {
-        "provider": "anthropic",
-        "model": "claude-opus-4-5-20251101",
+        "provider": "deepseek",
+        "model": "deepseek-chat",
         "display_name": "M7 Critical Analyst",
         "temperature": 0.6,  # Medium-high for diverse critique
-        "max_tokens": 16384,  # Opus supports 64K
+        "max_tokens": 16384,  # DeepSeek Chat supports 32K
         "system_prompt": """You are M7 (Critical Analyst), the red-team and flaw-finder.
 
 ## COGNITIVE FRAMEWORK
@@ -998,15 +1001,15 @@ Apply domain expertise:
 ```"""
     },
 
-    # M10: Meta-Reasoner - Claude Opus 4.5 (200K context, 64K output)
+    # M10: Meta-Reasoner - Claude Sonnet 4.5 (200K context, 64K output)
     # Role: Meta-cognition needs balanced analysis
     # Temperature: 0.4 (MEDIUM-LOW - thoughtful analysis)
     AgentRole.META_REASONER: {
         "provider": "anthropic",
-        "model": "claude-opus-4-5-20251101",
+        "model": "claude-sonnet-4-5-20250929",
         "display_name": "M10 Meta-Reasoner",
         "temperature": 0.4,  # Medium-low for meta-analysis
-        "max_tokens": 16384,  # Opus supports 64K
+        "max_tokens": 16384,  # Sonnet supports 64K
         "system_prompt": """You are M10 (Meta-Reasoner), the cognitive oversight specialist.
 
 ## COGNITIVE FRAMEWORK
@@ -1072,15 +1075,15 @@ Apply meta-cognitive analysis:
 - Make the final satisfaction judgment"""
     },
 
-    # M11: Integration Specialist - GPT-5.2 (400K context, 128K output)
+    # M11: Integration Specialist - GPT-5.1 (400K context, 128K output)
     # Role: Integration needs consistency
     # Temperature: 0.3 (LOW - consistent merging)
     AgentRole.INTEGRATOR: {
         "provider": "openai",
-        "model": "gpt-5.2",
+        "model": "gpt-5.1",
         "display_name": "M11 Integration Specialist",
         "temperature": 0.3,  # Low for consistent integration
-        "max_tokens": 65536,  # GPT-5.2 supports 128K
+        "max_tokens": 65536,  # GPT-5.1 supports 128K
         "system_prompt": """You are M11 (Integration Specialist), the output combiner and conflict resolver.
 
 ## COGNITIVE FRAMEWORK
@@ -1207,18 +1210,18 @@ Apply testing methodology:
         "max_tokens": 8192,  # GPT-5.2 supports 128K but orchestrator needs less
         "system_prompt": """You are the Master Orchestrator, commanding the 12-agent system.
 
-## YOUR AGENTS (12 different models for diversity)
+## YOUR AGENTS (12 different models - maximum diversity)
 - M1 (Strategic Planner): Claude Opus 4.5 - Planning, goal decomposition
 - M2 (Deep Researcher): Perplexity Sonar Pro - Web search, evidence gathering
-- M3 (Systems Architect): Claude Opus 4.5 - Technical design
+- M3 (Systems Architect): GPT-5.2 - Technical design
 - M4 (Implementation Expert): DeepSeek Reasoner - Code generation
 - M5 (Creative Ideator): GLM-4.7 - Alternative approaches, innovation
 - M6 (Quality Verifier): GPT-OSS-120B (Groq) - Fast validation
-- M7 (Critical Analyst): Claude Opus 4.5 - Red-teaming, finding flaws
+- M7 (Critical Analyst): DeepSeek Chat - Red-teaming, finding flaws
 - M8 (Content Editor): Gemini 3 Pro - Final polish
 - M9 (Domain Expert): Kimi K2 (Groq) - Specialized knowledge
-- M10 (Meta-Reasoner): Claude Opus 4.5 - Reasoning oversight
-- M11 (Integration Specialist): GPT-5.2 - Combining outputs
+- M10 (Meta-Reasoner): Claude Sonnet 4.5 - Reasoning oversight
+- M11 (Integration Specialist): GPT-5.1 - Combining outputs
 - M12 (Test Engineer): Gemini 3 Flash - Testing, validation
 
 ## PHASES
