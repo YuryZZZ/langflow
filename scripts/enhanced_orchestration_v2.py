@@ -79,6 +79,7 @@ API_KEYS = {
     "GROQ_API_KEY": os.environ.get("GROQ_API_KEY", ""),
     "PERPLEXITY_API_KEY": os.environ.get("PERPLEXITY_API_KEY", ""),
     "GOOGLE_API_KEY": os.environ.get("GOOGLE_API_KEY", ""),
+    "ZAI_API_KEY": os.environ.get("ZAI_API_KEY", ""),
 }
 
 # =============================================================================
@@ -190,7 +191,7 @@ class TaskState:
 AGENT_CONFIGS = {
     AgentRole.PLANNER: {
         "provider": "anthropic",
-        "model": "claude-sonnet-4-5-20250929",
+        "model": "claude-opus-4-5-20251101",
         "display_name": "M1 Strategic Planner",
         "temperature": 0.3,
         "max_tokens": 4096,
@@ -521,8 +522,8 @@ Before writing code:
     },
 
     AgentRole.IDEATOR: {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-5-20250929",
+        "provider": "zai",
+        "model": "glm-4.7",
         "display_name": "M5 Creative Ideator",
         "temperature": 0.8,
         "max_tokens": 4096,
@@ -610,7 +611,7 @@ What if we...?
 
     AgentRole.VERIFIER: {
         "provider": "groq",
-        "model": "llama-3.3-70b-versatile",
+        "model": "openai/gpt-oss-120b",
         "display_name": "M6 Quality Verifier",
         "temperature": 0.1,
         "max_tokens": 4096,
@@ -803,7 +804,7 @@ What's the worst-case scenario?
 
     AgentRole.EDITOR: {
         "provider": "google",
-        "model": "gemini-3-flash-preview",
+        "model": "gemini-3-pro-preview",
         "display_name": "M8 Content Editor",
         "temperature": 0.5,
         "max_tokens": 8192,
@@ -892,8 +893,8 @@ Apply editorial excellence:
     },
 
     AgentRole.DOMAIN_EXPERT: {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-5-20250929",
+        "provider": "groq",
+        "model": "moonshotai/kimi-k2-instruct-0905",
         "display_name": "M9 Domain Expert",
         "temperature": 0.3,
         "max_tokens": 4096,
@@ -1078,8 +1079,8 @@ Apply integration methodology:
     },
 
     AgentRole.TEST_ENGINEER: {
-        "provider": "deepseek",
-        "model": "deepseek-chat",
+        "provider": "google",
+        "model": "gemini-3-flash-preview",
         "display_name": "M12 Test Engineer",
         "temperature": 0.2,
         "max_tokens": 8192,
@@ -1454,6 +1455,7 @@ def build_agent_node(node_id: str, x: float, y: float, config: Dict, provider_ke
         "groq": {"type": "GroqModel", "key": "GROQ_API_KEY", "icon": "Groq"},
         "perplexity": {"type": "PerplexityModel", "key": "PERPLEXITY_API_KEY", "icon": "Perplexity"},
         "google": {"type": "GoogleGenerativeAIModel", "key": "GOOGLE_API_KEY", "icon": "Google"},
+        "zai": {"type": "OpenAIModel", "key": "ZAI_API_KEY", "icon": "brain", "base_url": "https://api.z.ai/api/coding/paas/v4/"},
     }
 
     prov_info = provider_map.get(provider, provider_map["openai"])
