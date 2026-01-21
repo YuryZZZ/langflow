@@ -1,52 +1,36 @@
 #!/usr/bin/env python3
 """
-ENHANCED MULTI-MODEL ORCHESTRATION SYSTEM v2.0
+ENHANCED MULTI-MODEL ORCHESTRATION SYSTEM v3.0
 ==============================================
-10x improved multi-agent system with:
+Properly diversified model assignments using ALL approved models:
 
-ARCHITECTURE IMPROVEMENTS:
-1. 12 Specialized Agents (up from 8) with cognitive role separation
-2. 4-Layer Memory System (Working, Episodic, Semantic, Procedural)
-3. Advanced Prompt Engineering with Chain-of-Thought and Tree-of-Thoughts
-4. MCP Tool Integration for external capabilities
-5. Evidence Ledger with confidence scoring and source tracking
-6. Ask-back Protocol for inter-agent clarification
-7. Parallel + Sequential hybrid execution
-8. Self-consistency verification with multiple reasoning paths
-9. Dynamic task routing based on complexity analysis
-10. Full state persistence with checkpoint/resume
+MODEL DIVERSITY (12 Agents using 12 different models):
+- M1  Strategic Planner:     Claude Opus 4.5 (best reasoning)
+- M2  Deep Researcher:       Perplexity Sonar Pro (web search)
+- M3  Systems Architect:     GPT-5.2 (strong architecture)
+- M4  Implementation Expert: DeepSeek Reasoner (code specialist)
+- M5  Creative Ideator:      Gemini 3 Pro (creative)
+- M6  Quality Verifier:      GPT-OSS-120B via Groq (fast validation)
+- M7  Critical Analyst:      GLM-4.7 (Chinese perspective/different thinking)
+- M8  Content Editor:        Gemini 3 Flash (fast polish)
+- M9  Domain Expert:         Kimi K2 via Groq (multilingual knowledge)
+- M10 Meta-Reasoner:         Claude Sonnet 4.5 (meta-cognition)
+- M11 Integration Specialist: GPT-5.1 (stable integration)
+- M12 Test Engineer:         DeepSeek Chat (code testing)
 
-AGENT ROLES (12 Specialists + 1 Orchestrator):
-M1  - Strategic Planner: High-level planning, goal decomposition, acceptance criteria
-M2  - Deep Researcher: Web search, fact-finding, source validation (Perplexity)
-M3  - Systems Architect: Technical design, architecture decisions, tradeoffs
-M4  - Implementation Expert: Code generation, concrete solutions (DeepSeek Reasoner)
-M5  - Creative Ideator: Alternative approaches, edge cases, innovation
-M6  - Quality Verifier: Fact-checking, validation, accuracy scoring (Groq fast)
-M7  - Critical Analyst: Red-teaming, finding flaws, contradiction detection
-M8  - Content Editor: Final polish, user-facing output, clarity
-M9  - Domain Expert: Specialized knowledge injection based on task domain
-M10 - Meta-Reasoner: Reasoning about reasoning, cognitive oversight
-M11 - Integration Specialist: Combining outputs, resolving conflicts
-M12 - Test Engineer: Test case generation, edge case validation
-
-MEMORY LAYERS:
-- Working Memory: Current task context, active state
-- Episodic Memory: Past interactions, what worked/failed
-- Semantic Memory: Domain knowledge, facts, relationships
-- Procedural Memory: How to do things, patterns, workflows
-
-WORKFLOW:
-Phase 1: UNDERSTAND (M1 + M9 + M10)
-Phase 2: RESEARCH (M2 parallel with M6)
-Phase 3: DESIGN (M3 + M5)
-Phase 4: IMPLEMENT (M4 + M12)
-Phase 5: VERIFY (M6 + M7)
-Phase 6: INTEGRATE (M11)
-Phase 7: POLISH (M8)
-Phase 8: META-CHECK (M10)
-
-Loops until satisfaction score >= 85% or max 5 iterations
+ALL APPROVED MODELS USED:
+- anthropic/claude-opus-4-5-20251101 (M1)
+- anthropic/claude-sonnet-4-5-20250929 (M10)
+- perplexity/sonar-pro (M2)
+- openai/gpt-5.2 (M3)
+- openai/gpt-5.1 (M11)
+- deepseek/deepseek-reasoner (M4)
+- deepseek/deepseek-chat (M12)
+- google/gemini-3-pro-preview (M5)
+- google/gemini-3-flash-preview (M8)
+- groq/openai/gpt-oss-120b (M6)
+- groq/moonshotai/kimi-k2-instruct-0905 (M9)
+- zai/glm-4.7 (M7)
 """
 
 import requests
@@ -56,6 +40,7 @@ import io
 import time
 import uuid
 import hashlib
+import os
 from datetime import datetime
 from typing import Optional, Dict, List, Any, Tuple
 from dataclasses import dataclass, field, asdict
@@ -71,7 +56,6 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 LANGFLOW_URL = "https://langflow-7vd3.onrender.com"
 
 # API Keys loaded from environment variables
-import os
 API_KEYS = {
     "OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY", ""),
     "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY", ""),
@@ -111,10 +95,10 @@ class MemoryType(Enum):
 class Evidence:
     """Evidence entry with source tracking and confidence scoring."""
     claim: str
-    source_type: str  # web, reasoning, expert, code
+    source_type: str
     source_url: Optional[str]
     snippet: str
-    confidence: float  # 0.0 to 1.0
+    confidence: float
     verified_by: List[str] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
     hash_id: str = field(default_factory=lambda: "")
@@ -130,7 +114,7 @@ class AskBack:
     to_agent: str
     question: str
     context: str
-    priority: str  # blocking, important, optional
+    priority: str
     response: Optional[str] = None
     resolved: bool = False
 
@@ -144,28 +128,17 @@ class TaskState:
     max_iterations: int = 5
     satisfaction_score: float = 0.0
     satisfaction_threshold: float = 0.85
-
-    # Memory layers
     working_memory: Dict[str, Any] = field(default_factory=dict)
     episodic_memory: List[Dict] = field(default_factory=list)
     semantic_memory: Dict[str, Any] = field(default_factory=dict)
     procedural_memory: Dict[str, List[str]] = field(default_factory=dict)
-
-    # Evidence and questions
     evidence_ledger: List[Evidence] = field(default_factory=list)
     ask_back_queue: List[AskBack] = field(default_factory=list)
-
-    # Agent outputs
     agent_outputs: Dict[str, List[Dict]] = field(default_factory=dict)
-
-    # Checkpoints
     checkpoints: List[Dict] = field(default_factory=list)
-
-    # Final output
     final_output: Optional[str] = None
 
     def to_dict(self) -> Dict:
-        """Convert to dictionary for serialization."""
         return {
             "task_id": self.task_id,
             "original_query": self.original_query,
@@ -185,48 +158,19 @@ class TaskState:
         }
 
 # =============================================================================
-# ENHANCED AGENT PROMPTS - Chain-of-Thought + Tree-of-Thoughts
+# AGENT CONFIGS - PROPERLY DIVERSIFIED MODELS
 # =============================================================================
 
-"""
-MODEL SPECIFICATIONS (Researched Jan 2026):
-- Claude Opus 4.5: 200K context, 64K max output
-- Claude Sonnet 4.5: 200K context, 64K max output
-- GPT-5.2: 400K context, 128K max output
-- GPT-5.1: 400K context, 128K max output
-- DeepSeek Reasoner: 64K context, 32K max output (no temp control)
-- DeepSeek Chat: 64K context, 8K max output
-- Gemini 3 Pro: 1M context, 64K max output
-- Gemini 3 Flash: 1M context, 32K max output
-- GLM-4.7: 200K context, 128K max output
-- Kimi K2: 128K context, varies
-- GPT-OSS-120B: 128K context, 16K max output
-- Perplexity Sonar Pro: 200K context, configurable
-
-TEMPERATURE GUIDE BY ROLE:
-- Planning/Analysis: 0.2-0.4 (structured, consistent)
-- Research/Verification: 0.1-0.3 (factual, precise)
-- Architecture/Design: 0.3-0.5 (balanced creativity + structure)
-- Implementation/Code: 0.0-0.2 (deterministic, precise)
-- Creative/Ideation: 0.7-1.0 (high creativity, diverse)
-- Critical/Review: 0.3-0.5 (balanced objectivity)
-- Editing/Polish: 0.4-0.6 (moderate creativity for flow)
-- Meta-reasoning: 0.3-0.5 (thoughtful analysis)
-- Integration: 0.2-0.4 (consistent merging)
-- Testing: 0.1-0.2 (precise, systematic)
-"""
-
 AGENT_CONFIGS = {
-    # M1: Strategic Planner - Claude Opus 4.5
-    # Role: Planning requires structured thinking but some flexibility
-    # Temperature: 0.4 (balanced - needs consistency but not rigid)
+    # M1: Strategic Planner - Claude Opus 4.5 (best reasoning for planning)
     AgentRole.PLANNER: {
         "provider": "anthropic",
         "model": "claude-opus-4-5-20251101",
         "display_name": "M1 Strategic Planner",
-        "temperature": 0.4,
-        "max_tokens": 32000,  # Opus supports 64K, use 32K for planning
+        "temperature": 0.3,
+        "max_tokens": 8192,
         "system_prompt": """You are M1 (Strategic Planner), the chief architect of task execution.
+Powered by Claude Opus 4.5 - the most capable reasoning model.
 
 ## COGNITIVE FRAMEWORK
 Apply structured thinking using Chain-of-Thought reasoning:
@@ -299,6 +243,7 @@ Before producing output, reason step-by-step:
 - Plan for iteration if first attempt fails"""
     },
 
+    # M2: Deep Researcher - Perplexity Sonar Pro (web search specialist)
     AgentRole.RESEARCHER: {
         "provider": "perplexity",
         "model": "sonar-pro",
@@ -306,6 +251,7 @@ Before producing output, reason step-by-step:
         "temperature": 0.2,
         "max_tokens": 8192,
         "system_prompt": """You are M2 (Deep Researcher), the knowledge acquisition specialist.
+Powered by Perplexity Sonar Pro - optimized for web search and research.
 
 ## COGNITIVE FRAMEWORK
 Apply systematic research methodology:
@@ -370,13 +316,15 @@ For each claim or fact:
 - Flag contradictory findings explicitly"""
     },
 
+    # M3: Systems Architect - GPT-5.2 (strong architecture skills)
     AgentRole.ARCHITECT: {
-        "provider": "anthropic",
-        "model": "claude-opus-4-5-20251101",
+        "provider": "openai",
+        "model": "gpt-5.2",
         "display_name": "M3 Systems Architect",
         "temperature": 0.4,
         "max_tokens": 8192,
         "system_prompt": """You are M3 (Systems Architect), the technical design authority.
+Powered by GPT-5.2 - excellent at structured system design.
 
 ## COGNITIVE FRAMEWORK
 Apply architectural thinking with Tree-of-Thoughts:
@@ -472,6 +420,7 @@ Rationale: [why this is best]
 - Identify integration points clearly"""
     },
 
+    # M4: Implementation Expert - DeepSeek Reasoner (code specialist)
     AgentRole.IMPLEMENTER: {
         "provider": "deepseek",
         "model": "deepseek-reasoner",
@@ -479,6 +428,7 @@ Rationale: [why this is best]
         "temperature": 0.1,
         "max_tokens": 16384,
         "system_prompt": """You are M4 (Implementation Expert), the code and solution builder.
+Powered by DeepSeek Reasoner - specialized for code generation and reasoning.
 
 ## COGNITIVE FRAMEWORK
 Apply implementation reasoning:
@@ -507,7 +457,7 @@ Before writing code:
       "filename": "example.py",
       "language": "python",
       "purpose": "What this file does",
-      "code": "```python\\n# Full working code\\n```",
+      "code": "# Full working code here",
       "dependencies": ["package1>=1.0.0"],
       "usage_example": "How to use this code"
     }
@@ -525,7 +475,7 @@ Before writing code:
       "name": "Test case name",
       "input": "Test input",
       "expected_output": "Expected result",
-      "test_code": "```python\\n# Test code\\n```"
+      "test_code": "# Test code here"
     }
   ],
   "error_handling": [
@@ -552,16 +502,15 @@ Before writing code:
 - Consider edge cases (empty input, large input, invalid input)"""
     },
 
-    # M5: Creative Ideator - GLM-4.7 (200K context, 128K output)
-    # Role: Maximum creativity - divergent thinking, brainstorming
-    # Temperature: 0.9 (HIGH - creativity is the goal)
+    # M5: Creative Ideator - Gemini 3 Pro (creative thinking)
     AgentRole.IDEATOR: {
-        "provider": "zai",
-        "model": "glm-4.7",
+        "provider": "google",
+        "model": "gemini-3-pro-preview",
         "display_name": "M5 Creative Ideator",
-        "temperature": 0.9,  # HIGH for creativity
-        "max_tokens": 32768,  # GLM-4.7 supports 128K output
+        "temperature": 0.8,
+        "max_tokens": 8192,
         "system_prompt": """You are M5 (Creative Ideator), the innovation and exploration specialist.
+Powered by Gemini 3 Pro - excellent for creative and divergent thinking.
 
 ## COGNITIVE FRAMEWORK
 Apply divergent thinking:
@@ -643,16 +592,15 @@ What if we...?
 - Ask provocative questions"""
     },
 
-    # M6: Quality Verifier - GPT-OSS-120B via Groq (128K context, 32K output)
-    # Role: Verification requires precision
-    # Temperature: 0.1 (VERY LOW - accuracy critical)
+    # M6: Quality Verifier - GPT-OSS-120B via Groq (fast + powerful)
     AgentRole.VERIFIER: {
         "provider": "groq",
         "model": "openai/gpt-oss-120b",
         "display_name": "M6 Quality Verifier",
-        "temperature": 0.1,  # Very low for precision
-        "max_tokens": 16384,  # GPT-OSS-120B supports 32K
+        "temperature": 0.1,
+        "max_tokens": 4096,
         "system_prompt": """You are M6 (Quality Verifier), the accuracy and validation specialist.
+Powered by GPT-OSS-120B on Groq - fast and accurate verification.
 
 ## COGNITIVE FRAMEWORK
 Apply verification methodology:
@@ -733,16 +681,15 @@ For each claim or artifact:
 - Validate code can actually run"""
     },
 
-    # M7: Critical Analyst - Claude Opus 4.5 (200K context, 64K output)
-    # Role: Red-teaming needs balanced skepticism + creativity to find issues
-    # Temperature: 0.6 (MEDIUM-HIGH - find diverse problems)
+    # M7: Critical Analyst - GLM-4.7 (different perspective)
     AgentRole.CRITIC: {
-        "provider": "anthropic",
-        "model": "claude-opus-4-5-20251101",
+        "provider": "zai",
+        "model": "glm-4.7",
         "display_name": "M7 Critical Analyst",
-        "temperature": 0.6,  # Medium-high for diverse critique
-        "max_tokens": 16384,  # Opus supports 64K
+        "temperature": 0.5,
+        "max_tokens": 8192,
         "system_prompt": """You are M7 (Critical Analyst), the red-team and flaw-finder.
+Powered by GLM-4.7 - bringing diverse perspective to critical analysis.
 
 ## COGNITIVE FRAMEWORK
 Apply adversarial thinking:
@@ -842,16 +789,15 @@ What's the worst-case scenario?
 - Don't just criticize - provide constructive fixes"""
     },
 
-    # M8: Content Editor - Gemini 3 Pro (1M context, 64K output)
-    # Role: Editing needs moderate creativity for flow + clarity
-    # Temperature: 0.5 (MEDIUM - balance clarity with style)
+    # M8: Content Editor - Gemini 3 Flash (fast polish)
     AgentRole.EDITOR: {
         "provider": "google",
-        "model": "gemini-3-pro-preview",
+        "model": "gemini-3-flash-preview",
         "display_name": "M8 Content Editor",
-        "temperature": 0.5,  # Medium for balanced editing
-        "max_tokens": 32768,  # Gemini 3 Pro supports 64K
+        "temperature": 0.5,
+        "max_tokens": 8192,
         "system_prompt": """You are M8 (Content Editor), the final polish and presentation specialist.
+Powered by Gemini 3 Flash - fast and fluent content generation.
 
 ## COGNITIVE FRAMEWORK
 Apply editorial excellence:
@@ -921,7 +867,7 @@ Apply editorial excellence:
 - [Source 2](url)
 
 ---
-*Generated by Enhanced Multi-Agent Orchestration System v2.0*
+*Generated by Enhanced Multi-Agent Orchestration System v3.0*
 *Confidence Score: X%*
 ```
 
@@ -935,16 +881,15 @@ Apply editorial excellence:
 - Cite sources"""
     },
 
-    # M9: Domain Expert - Kimi K2 via Groq (128K context, 16K output)
-    # Role: Domain knowledge requires factual precision
-    # Temperature: 0.3 (LOW - knowledge accuracy)
+    # M9: Domain Expert - Kimi K2 via Groq (multilingual knowledge)
     AgentRole.DOMAIN_EXPERT: {
         "provider": "groq",
         "model": "moonshotai/kimi-k2-instruct-0905",
         "display_name": "M9 Domain Expert",
-        "temperature": 0.3,  # Low for factual accuracy
-        "max_tokens": 8192,  # Kimi K2 supports 16K
+        "temperature": 0.3,
+        "max_tokens": 8192,
         "system_prompt": """You are M9 (Domain Expert), the specialized knowledge injector.
+Powered by Kimi K2 - extensive multilingual and cross-domain knowledge.
 
 ## COGNITIVE FRAMEWORK
 Apply domain expertise:
@@ -993,21 +938,34 @@ Apply domain expertise:
       "rationale": "Why needed",
       "implementation_guidance": "How to implement"
     }
+  ],
+  "cross_cultural_considerations": [
+    {
+      "consideration": "Description",
+      "regions_affected": ["region1"],
+      "recommendation": "How to handle"
+    }
   ]
 }
-```"""
+```
+
+## CRITICAL RULES
+- Identify domain accurately
+- Provide actionable best practices
+- Warn about common pitfalls
+- Consider cultural/regional factors
+- Use proper domain terminology"""
     },
 
-    # M10: Meta-Reasoner - Claude Opus 4.5 (200K context, 64K output)
-    # Role: Meta-cognition needs balanced analysis
-    # Temperature: 0.4 (MEDIUM-LOW - thoughtful analysis)
+    # M10: Meta-Reasoner - Claude Sonnet 4.5 (meta-cognition)
     AgentRole.META_REASONER: {
         "provider": "anthropic",
-        "model": "claude-opus-4-5-20251101",
+        "model": "claude-sonnet-4-5-20250929",
         "display_name": "M10 Meta-Reasoner",
-        "temperature": 0.4,  # Medium-low for meta-analysis
-        "max_tokens": 16384,  # Opus supports 64K
+        "temperature": 0.4,
+        "max_tokens": 8192,
         "system_prompt": """You are M10 (Meta-Reasoner), the cognitive oversight specialist.
+Powered by Claude Sonnet 4.5 - excellent meta-cognitive capabilities.
 
 ## COGNITIVE FRAMEWORK
 Apply meta-cognitive analysis:
@@ -1072,16 +1030,15 @@ Apply meta-cognitive analysis:
 - Make the final satisfaction judgment"""
     },
 
-    # M11: Integration Specialist - GPT-5.2 (400K context, 128K output)
-    # Role: Integration needs consistency
-    # Temperature: 0.3 (LOW - consistent merging)
+    # M11: Integration Specialist - GPT-5.1 (stable integration)
     AgentRole.INTEGRATOR: {
         "provider": "openai",
-        "model": "gpt-5.2",
+        "model": "gpt-5.1",
         "display_name": "M11 Integration Specialist",
-        "temperature": 0.3,  # Low for consistent integration
-        "max_tokens": 65536,  # GPT-5.2 supports 128K
+        "temperature": 0.3,
+        "max_tokens": 8192,
         "system_prompt": """You are M11 (Integration Specialist), the output combiner and conflict resolver.
+Powered by GPT-5.1 - stable and reliable for integration tasks.
 
 ## COGNITIVE FRAMEWORK
 Apply integration methodology:
@@ -1127,19 +1084,25 @@ Apply integration methodology:
     }
   ]
 }
-```"""
+```
+
+## CRITICAL RULES
+- Resolve ALL conflicts explicitly
+- Maintain traceability to source agents
+- Ensure logical consistency
+- Preserve important nuances
+- Document integration decisions"""
     },
 
-    # M12: Test Engineer - Gemini 3 Flash (1M context, 32K output)
-    # Role: Testing needs precision for code correctness
-    # Temperature: 0.2 (LOW - test code must be correct)
+    # M12: Test Engineer - DeepSeek Chat (code testing)
     AgentRole.TEST_ENGINEER: {
-        "provider": "google",
-        "model": "gemini-3-flash-preview",
+        "provider": "deepseek",
+        "model": "deepseek-chat",
         "display_name": "M12 Test Engineer",
-        "temperature": 0.2,  # Low for test precision
-        "max_tokens": 16384,  # Gemini Flash supports 32K
+        "temperature": 0.2,
+        "max_tokens": 8192,
         "system_prompt": """You are M12 (Test Engineer), the testing and validation specialist.
+Powered by DeepSeek Chat - strong code understanding for testing.
 
 ## COGNITIVE FRAMEWORK
 Apply testing methodology:
@@ -1165,7 +1128,7 @@ Apply testing methodology:
       "preconditions": ["precondition1"],
       "input": "Test input",
       "expected_output": "Expected result",
-      "test_code": "```python\\n# Test code\\n```",
+      "test_code": "# Test code here",
       "priority": "high|medium|low"
     }
   ],
@@ -1175,7 +1138,7 @@ Apply testing methodology:
       "scenario": "Edge case description",
       "input": "Edge input",
       "expected_behavior": "What should happen",
-      "test_code": "```python\\n# Test code\\n```"
+      "test_code": "# Test code here"
     }
   ],
   "test_results": [
@@ -1193,33 +1156,38 @@ Apply testing methodology:
     "recommendations": ["recommendation1"]
   }
 }
-```"""
+```
+
+## CRITICAL RULES
+- Write RUNNABLE tests
+- Cover edge cases thoroughly
+- Include positive and negative tests
+- Test error conditions
+- Provide clear pass/fail criteria"""
     },
 
-    # ORCHESTRATOR: GPT-5.2 (400K context, 128K output)
-    # Role: Coordination needs precision + consistency
-    # Temperature: 0.2 (LOW - coordination precision)
+    # Orchestrator - GPT-5.2 (coordination)
     AgentRole.ORCHESTRATOR: {
         "provider": "openai",
         "model": "gpt-5.2",
         "display_name": "Master Orchestrator",
-        "temperature": 0.2,  # Low for coordination precision
-        "max_tokens": 8192,  # GPT-5.2 supports 128K but orchestrator needs less
+        "temperature": 0.2,
+        "max_tokens": 4096,
         "system_prompt": """You are the Master Orchestrator, commanding the 12-agent system.
 
-## YOUR AGENTS (12 different models for diversity)
+## YOUR AGENTS (12 different models)
 - M1 (Strategic Planner): Claude Opus 4.5 - Planning, goal decomposition
-- M2 (Deep Researcher): Perplexity Sonar Pro - Web search, evidence gathering
-- M3 (Systems Architect): Claude Opus 4.5 - Technical design
+- M2 (Deep Researcher): Perplexity Sonar Pro - Web search, evidence
+- M3 (Systems Architect): GPT-5.2 - Technical design
 - M4 (Implementation Expert): DeepSeek Reasoner - Code generation
-- M5 (Creative Ideator): GLM-4.7 - Alternative approaches, innovation
+- M5 (Creative Ideator): Gemini 3 Pro - Alternative approaches
 - M6 (Quality Verifier): GPT-OSS-120B (Groq) - Fast validation
-- M7 (Critical Analyst): Claude Opus 4.5 - Red-teaming, finding flaws
-- M8 (Content Editor): Gemini 3 Pro - Final polish
+- M7 (Critical Analyst): GLM-4.7 - Red-teaming, diverse perspective
+- M8 (Content Editor): Gemini 3 Flash - Final polish
 - M9 (Domain Expert): Kimi K2 (Groq) - Specialized knowledge
-- M10 (Meta-Reasoner): Claude Opus 4.5 - Reasoning oversight
-- M11 (Integration Specialist): GPT-5.2 - Combining outputs
-- M12 (Test Engineer): Gemini 3 Flash - Testing, validation
+- M10 (Meta-Reasoner): Claude Sonnet 4.5 - Cognitive oversight
+- M11 (Integration Specialist): GPT-5.1 - Output merging
+- M12 (Test Engineer): DeepSeek Chat - Testing
 
 ## PHASES
 1. UNDERSTAND: M1 + M9 + M10 (sequential)
@@ -1414,44 +1382,6 @@ def build_chat_output_node(node_id: str, x: float, y: float) -> Dict:
     }
 
 
-def build_prompt_node(node_id: str, x: float, y: float, template: str, name: str = "Prompt") -> Dict:
-    """Build a Prompt node."""
-    return {
-        "id": node_id,
-        "type": "genericNode",
-        "position": {"x": x, "y": y},
-        "data": {
-            "id": node_id,
-            "type": "Prompt",
-            "node": {
-                "display_name": name,
-                "description": "System prompt template",
-                "icon": "prompts",
-                "base_classes": ["Message"],
-                "outputs": [
-                    {
-                        "name": "prompt",
-                        "display_name": "Prompt",
-                        "types": ["Message"],
-                        "selected": "Message",
-                        "method": "build_prompt"
-                    }
-                ],
-                "template": {
-                    "template": {
-                        "type": "prompt",
-                        "required": True,
-                        "display_name": "Template",
-                        "value": template,
-                        "show": True,
-                        "multiline": True
-                    }
-                }
-            }
-        }
-    }
-
-
 def build_memory_node(node_id: str, x: float, y: float, session_id: str, n_messages: int = 100) -> Dict:
     """Build a Memory node for conversation history."""
     return {
@@ -1505,19 +1435,106 @@ def build_agent_node(node_id: str, x: float, y: float, config: Dict, provider_ke
     temperature = config.get("temperature", 0.7)
     max_tokens = config.get("max_tokens", 4096)
 
-    # Map provider to Langflow model type
+    # Map provider to Langflow model type and API key
     provider_map = {
-        "openai": {"type": "OpenAIModel", "key": "OPENAI_API_KEY", "icon": "OpenAI"},
-        "anthropic": {"type": "AnthropicModel", "key": "ANTHROPIC_API_KEY", "icon": "Anthropic"},
-        "deepseek": {"type": "DeepSeekModel", "key": "DEEPSEEK_API_KEY", "icon": "DeepSeek"},
-        "groq": {"type": "GroqModel", "key": "GROQ_API_KEY", "icon": "Groq"},
-        "perplexity": {"type": "PerplexityModel", "key": "PERPLEXITY_API_KEY", "icon": "Perplexity"},
-        "google": {"type": "GoogleGenerativeAIModel", "key": "GOOGLE_API_KEY", "icon": "Google"},
-        "zai": {"type": "OpenAIModel", "key": "ZAI_API_KEY", "icon": "brain", "base_url": "https://api.z.ai/api/coding/paas/v4/"},
+        "openai": {"type": "OpenAIModel", "key": "OPENAI_API_KEY", "icon": "OpenAI", "display": "OpenAI"},
+        "anthropic": {"type": "AnthropicModel", "key": "ANTHROPIC_API_KEY", "icon": "Anthropic", "display": "Anthropic"},
+        "deepseek": {"type": "DeepSeekModel", "key": "DEEPSEEK_API_KEY", "icon": "DeepSeek", "display": "DeepSeek"},
+        "groq": {"type": "GroqModel", "key": "GROQ_API_KEY", "icon": "Groq", "display": "Groq"},
+        "perplexity": {"type": "PerplexityModel", "key": "PERPLEXITY_API_KEY", "icon": "Perplexity", "display": "Perplexity"},
+        "google": {"type": "GoogleGenerativeAIModel", "key": "GOOGLE_API_KEY", "icon": "Google", "display": "Google Generative AI"},
+        "zai": {"type": "OpenAIModel", "key": "ZAI_API_KEY", "icon": "brain", "display": "Custom"},
     }
 
     prov_info = provider_map.get(provider, provider_map["openai"])
     api_key = API_KEYS.get(prov_info["key"], "")
+
+    template = {
+        "agent_llm": {
+            "type": "str",
+            "required": True,
+            "display_name": "Model Provider",
+            "value": prov_info["display"],
+            "show": True,
+            "options": ["OpenAI", "Anthropic", "Google Generative AI", "Groq", "DeepSeek", "Perplexity", "Custom"]
+        },
+        "model_name": {
+            "type": "str",
+            "required": True,
+            "display_name": "Model",
+            "value": model,
+            "show": True
+        },
+        "api_key": {
+            "type": "str",
+            "required": True,
+            "display_name": "API Key",
+            "value": api_key,
+            "password": True,
+            "show": True
+        },
+        "system_prompt": {
+            "type": "str",
+            "required": False,
+            "display_name": "Agent Instructions",
+            "value": system_prompt,
+            "show": True,
+            "multiline": True
+        },
+        "input_value": {
+            "type": "str",
+            "required": True,
+            "display_name": "Input",
+            "input_types": ["Message"],
+            "show": True
+        },
+        "tools": {
+            "type": "list",
+            "required": False,
+            "display_name": "Tools",
+            "input_types": ["Tool"],
+            "show": True,
+            "is_list": True
+        },
+        "max_tokens": {
+            "type": "int",
+            "required": False,
+            "display_name": "Max Tokens",
+            "value": max_tokens,
+            "show": True
+        },
+        "temperature": {
+            "type": "float",
+            "required": False,
+            "display_name": "Temperature",
+            "value": temperature,
+            "show": True
+        },
+        "max_iterations": {
+            "type": "int",
+            "required": False,
+            "display_name": "Max Iterations",
+            "value": 15,
+            "show": True
+        },
+        "verbose": {
+            "type": "bool",
+            "required": False,
+            "display_name": "Verbose",
+            "value": True,
+            "show": True
+        }
+    }
+
+    # Add base_url for ZAI/GLM
+    if provider == "zai":
+        template["openai_api_base"] = {
+            "type": "str",
+            "required": False,
+            "display_name": "OpenAI API Base",
+            "value": "https://api.z.ai/api/coding/paas/v4/",
+            "show": True
+        }
 
     return {
         "id": node_id,
@@ -1540,141 +1557,7 @@ def build_agent_node(node_id: str, x: float, y: float, config: Dict, provider_ke
                         "method": "message_response"
                     }
                 ],
-                "template": {
-                    "agent_llm": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "Model Provider",
-                        "value": provider.title() if provider != "google" else "Google Generative AI",
-                        "show": True,
-                        "options": ["OpenAI", "Anthropic", "Google Generative AI", "Groq", "DeepSeek", "Perplexity"]
-                    },
-                    "model_name": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "Model",
-                        "value": model,
-                        "show": True
-                    },
-                    "api_key": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "API Key",
-                        "value": api_key,
-                        "password": True,
-                        "show": True
-                    },
-                    "system_prompt": {
-                        "type": "str",
-                        "required": False,
-                        "display_name": "Agent Instructions",
-                        "value": system_prompt,
-                        "show": True,
-                        "multiline": True
-                    },
-                    "input_value": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "Input",
-                        "input_types": ["Message"],
-                        "show": True
-                    },
-                    "tools": {
-                        "type": "list",
-                        "required": False,
-                        "display_name": "Tools",
-                        "input_types": ["Tool"],
-                        "show": True,
-                        "is_list": True
-                    },
-                    "max_tokens": {
-                        "type": "int",
-                        "required": False,
-                        "display_name": "Max Tokens",
-                        "value": max_tokens,
-                        "show": True
-                    },
-                    "temperature": {
-                        "type": "float",
-                        "required": False,
-                        "display_name": "Temperature",
-                        "value": temperature,
-                        "show": True
-                    },
-                    "max_iterations": {
-                        "type": "int",
-                        "required": False,
-                        "display_name": "Max Iterations",
-                        "value": 15,
-                        "show": True
-                    },
-                    "verbose": {
-                        "type": "bool",
-                        "required": False,
-                        "display_name": "Verbose",
-                        "value": True,
-                        "show": True
-                    }
-                }
-            }
-        }
-    }
-
-
-def build_conditional_router_node(node_id: str, x: float, y: float, match_text: str, operator: str = "contains") -> Dict:
-    """Build a Conditional Router node."""
-    return {
-        "id": node_id,
-        "type": "genericNode",
-        "position": {"x": x, "y": y},
-        "data": {
-            "id": node_id,
-            "type": "ConditionalRouter",
-            "node": {
-                "display_name": "Conditional Router",
-                "description": "Route based on condition",
-                "icon": "split",
-                "base_classes": ["Message"],
-                "outputs": [
-                    {
-                        "name": "true_result",
-                        "display_name": "True",
-                        "types": ["Message"],
-                        "selected": "Message",
-                        "method": "true_response"
-                    },
-                    {
-                        "name": "false_result",
-                        "display_name": "False",
-                        "types": ["Message"],
-                        "selected": "Message",
-                        "method": "false_response"
-                    }
-                ],
-                "template": {
-                    "input_text": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "Input",
-                        "input_types": ["Message"],
-                        "show": True
-                    },
-                    "match_text": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "Match Text",
-                        "value": match_text,
-                        "show": True
-                    },
-                    "operator": {
-                        "type": "str",
-                        "required": True,
-                        "display_name": "Operator",
-                        "value": operator,
-                        "show": True,
-                        "options": ["equals", "not_equals", "contains", "not_contains", "greater_than", "less_than", "regex"]
-                    }
-                }
+                "template": template
             }
         }
     }
@@ -1797,7 +1680,7 @@ def build_edge(source_id: str, source_handle: str, target_id: str, target_handle
 def build_single_agent_flow(role: AgentRole) -> Dict:
     """Build a standalone flow for a single agent."""
     config = AGENT_CONFIGS[role]
-    flow_name = f"V2/{config['display_name']}"
+    flow_name = f"V3/{config['display_name']}"
 
     input_id = generate_node_id("ChatInput")
     agent_id = generate_node_id("Agent")
@@ -1806,7 +1689,7 @@ def build_single_agent_flow(role: AgentRole) -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_memory_node(memory_id, 100, 100, f"v2_agent_{role.value}"),
+        build_memory_node(memory_id, 100, 100, f"v3_agent_{role.value}"),
         build_agent_node(agent_id, 500, 300, config, role.value),
         build_chat_output_node(output_id, 900, 300)
     ]
@@ -1819,7 +1702,7 @@ def build_single_agent_flow(role: AgentRole) -> Dict:
 
     return {
         "name": flow_name,
-        "description": f"{config['display_name']} - Enhanced Orchestration v2",
+        "description": f"{config['display_name']} - Model: {config['model']}",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -1840,10 +1723,10 @@ def build_phase1_understand_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m1_id, 350, 300, "V2/M1 Strategic Planner"),
-        build_run_flow_node(m9_id, 600, 300, "V2/M9 Domain Expert"),
+        build_run_flow_node(m1_id, 350, 300, "V3/M1 Strategic Planner"),
+        build_run_flow_node(m9_id, 600, 300, "V3/M9 Domain Expert"),
         build_combine_text_node(combine1_id, 850, 300),
-        build_run_flow_node(m10_id, 1100, 300, "V2/M10 Meta-Reasoner"),
+        build_run_flow_node(m10_id, 1100, 300, "V3/M10 Meta-Reasoner"),
         build_combine_text_node(combine2_id, 1350, 300),
         build_chat_output_node(output_id, 1600, 300)
     ]
@@ -1860,8 +1743,8 @@ def build_phase1_understand_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 1 - Understand",
-        "description": "M1 Strategic Planner -> M9 Domain Expert -> M10 Meta-Reasoner",
+        "name": "V3/Phase 1 - Understand",
+        "description": "Claude Opus (M1) -> Kimi K2 (M9) -> Claude Sonnet (M10)",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -1880,8 +1763,8 @@ def build_phase2_research_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m2_id, 400, 150, "V2/M2 Deep Researcher"),
-        build_run_flow_node(m6_id, 400, 450, "V2/M6 Quality Verifier"),
+        build_run_flow_node(m2_id, 400, 150, "V3/M2 Deep Researcher"),
+        build_run_flow_node(m6_id, 400, 450, "V3/M6 Quality Verifier"),
         build_combine_text_node(combine_id, 700, 300, "\n\n=== VERIFICATION ===\n\n"),
         build_chat_output_node(output_id, 1000, 300)
     ]
@@ -1895,8 +1778,8 @@ def build_phase2_research_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 2 - Research",
-        "description": "M2 Deep Researcher || M6 Quality Verifier (parallel)",
+        "name": "V3/Phase 2 - Research",
+        "description": "Perplexity Sonar Pro (M2) || GPT-OSS-120B (M6) parallel",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -1915,8 +1798,8 @@ def build_phase3_design_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m3_id, 400, 300, "V2/M3 Systems Architect"),
-        build_run_flow_node(m5_id, 700, 300, "V2/M5 Creative Ideator"),
+        build_run_flow_node(m3_id, 400, 300, "V3/M3 Systems Architect"),
+        build_run_flow_node(m5_id, 700, 300, "V3/M5 Creative Ideator"),
         build_combine_text_node(combine_id, 1000, 300),
         build_chat_output_node(output_id, 1300, 300)
     ]
@@ -1930,8 +1813,8 @@ def build_phase3_design_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 3 - Design",
-        "description": "M3 Systems Architect -> M5 Creative Ideator",
+        "name": "V3/Phase 3 - Design",
+        "description": "GPT-5.2 (M3) -> Gemini 3 Pro (M5)",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -1950,8 +1833,8 @@ def build_phase4_implement_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m4_id, 400, 300, "V2/M4 Implementation Expert"),
-        build_run_flow_node(m12_id, 700, 300, "V2/M12 Test Engineer"),
+        build_run_flow_node(m4_id, 400, 300, "V3/M4 Implementation Expert"),
+        build_run_flow_node(m12_id, 700, 300, "V3/M12 Test Engineer"),
         build_combine_text_node(combine_id, 1000, 300),
         build_chat_output_node(output_id, 1300, 300)
     ]
@@ -1965,8 +1848,8 @@ def build_phase4_implement_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 4 - Implement",
-        "description": "M4 Implementation Expert -> M12 Test Engineer",
+        "name": "V3/Phase 4 - Implement",
+        "description": "DeepSeek Reasoner (M4) -> DeepSeek Chat (M12)",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -1985,8 +1868,8 @@ def build_phase5_verify_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m6_id, 400, 150, "V2/M6 Quality Verifier"),
-        build_run_flow_node(m7_id, 400, 450, "V2/M7 Critical Analyst"),
+        build_run_flow_node(m6_id, 400, 150, "V3/M6 Quality Verifier"),
+        build_run_flow_node(m7_id, 400, 450, "V3/M7 Critical Analyst"),
         build_combine_text_node(combine_id, 700, 300, "\n\n=== CRITICAL ANALYSIS ===\n\n"),
         build_chat_output_node(output_id, 1000, 300)
     ]
@@ -2000,8 +1883,8 @@ def build_phase5_verify_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 5 - Verify",
-        "description": "M6 Quality Verifier || M7 Critical Analyst (parallel)",
+        "name": "V3/Phase 5 - Verify",
+        "description": "GPT-OSS-120B (M6) || GLM-4.7 (M7) parallel",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -2018,7 +1901,7 @@ def build_phase6_integrate_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m11_id, 400, 300, "V2/M11 Integration Specialist"),
+        build_run_flow_node(m11_id, 400, 300, "V3/M11 Integration Specialist"),
         build_chat_output_node(output_id, 700, 300)
     ]
 
@@ -2028,8 +1911,8 @@ def build_phase6_integrate_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 6 - Integrate",
-        "description": "M11 Integration Specialist",
+        "name": "V3/Phase 6 - Integrate",
+        "description": "GPT-5.1 (M11) - Integration",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -2046,7 +1929,7 @@ def build_phase7_polish_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m8_id, 400, 300, "V2/M8 Content Editor"),
+        build_run_flow_node(m8_id, 400, 300, "V3/M8 Content Editor"),
         build_chat_output_node(output_id, 700, 300)
     ]
 
@@ -2056,8 +1939,8 @@ def build_phase7_polish_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Phase 7 - Polish",
-        "description": "M8 Content Editor - Final Output",
+        "name": "V3/Phase 7 - Polish",
+        "description": "Gemini 3 Flash (M8) - Final Output",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -2070,38 +1953,32 @@ def build_phase8_metacheck_flow() -> Dict:
     """Build Phase 8: META-CHECK (M10)."""
     input_id = generate_node_id("ChatInput")
     m10_id = generate_node_id("RunFlow")
-    router_id = generate_node_id("Router")
     output_id = generate_node_id("ChatOutput")
 
     nodes = [
         build_chat_input_node(input_id, 100, 300),
-        build_run_flow_node(m10_id, 400, 300, "V2/M10 Meta-Reasoner"),
-        build_conditional_router_node(router_id, 700, 300, "ready_for_output", "contains"),
-        build_chat_output_node(output_id, 1000, 300)
+        build_run_flow_node(m10_id, 400, 300, "V3/M10 Meta-Reasoner"),
+        build_chat_output_node(output_id, 700, 300)
     ]
 
     edges = [
         build_edge(input_id, "message", m10_id, "input_value"),
-        build_edge(m10_id, "output", router_id, "input_text"),
-        build_edge(router_id, "true_result", output_id, "input_value")
+        build_edge(m10_id, "output", output_id, "input_value")
     ]
 
     return {
-        "name": "V2/Phase 8 - Meta-Check",
-        "description": "M10 Meta-Reasoner - Satisfaction Check",
+        "name": "V3/Phase 8 - Meta-Check",
+        "description": "Claude Sonnet 4.5 (M10) - Satisfaction Check",
         "data": {
             "nodes": nodes,
             "edges": edges,
-            "viewport": {"x": 0, "y": 0, "zoom": 0.7}
+            "viewport": {"x": 0, "y": 0, "zoom": 0.8}
         }
     }
 
 
 def build_master_orchestrator_flow() -> Dict:
     """Build the Master Orchestrator flow coordinating all phases."""
-    # This is a simplified orchestrator that chains all phases
-    # In production, you'd want more sophisticated routing
-
     input_id = generate_node_id("ChatInput")
     memory_id = generate_node_id("Memory")
 
@@ -2118,16 +1995,16 @@ def build_master_orchestrator_flow() -> Dict:
 
     nodes = [
         build_chat_input_node(input_id, 50, 400),
-        build_memory_node(memory_id, 50, 200, "v2_orchestrator_main", 200),
+        build_memory_node(memory_id, 50, 200, "v3_orchestrator_main", 200),
 
-        build_run_flow_node(phase1_id, 250, 400, "V2/Phase 1 - Understand"),
-        build_run_flow_node(phase2_id, 450, 400, "V2/Phase 2 - Research"),
-        build_run_flow_node(phase3_id, 650, 400, "V2/Phase 3 - Design"),
-        build_run_flow_node(phase4_id, 850, 400, "V2/Phase 4 - Implement"),
-        build_run_flow_node(phase5_id, 1050, 400, "V2/Phase 5 - Verify"),
-        build_run_flow_node(phase6_id, 1250, 400, "V2/Phase 6 - Integrate"),
-        build_run_flow_node(phase7_id, 1450, 400, "V2/Phase 7 - Polish"),
-        build_run_flow_node(phase8_id, 1650, 400, "V2/Phase 8 - Meta-Check"),
+        build_run_flow_node(phase1_id, 250, 400, "V3/Phase 1 - Understand"),
+        build_run_flow_node(phase2_id, 450, 400, "V3/Phase 2 - Research"),
+        build_run_flow_node(phase3_id, 650, 400, "V3/Phase 3 - Design"),
+        build_run_flow_node(phase4_id, 850, 400, "V3/Phase 4 - Implement"),
+        build_run_flow_node(phase5_id, 1050, 400, "V3/Phase 5 - Verify"),
+        build_run_flow_node(phase6_id, 1250, 400, "V3/Phase 6 - Integrate"),
+        build_run_flow_node(phase7_id, 1450, 400, "V3/Phase 7 - Polish"),
+        build_run_flow_node(phase8_id, 1650, 400, "V3/Phase 8 - Meta-Check"),
 
         build_chat_output_node(output_id, 1850, 400)
     ]
@@ -2145,8 +2022,8 @@ def build_master_orchestrator_flow() -> Dict:
     ]
 
     return {
-        "name": "V2/Master Orchestrator",
-        "description": "Enhanced 12-Agent Multi-Model Orchestration System v2.0",
+        "name": "V3/Master Orchestrator",
+        "description": "12-Model Multi-Agent System: Opus, GPT-5.2, Gemini Pro, DeepSeek, GLM-4.7, Kimi K2, GPT-OSS-120B",
         "data": {
             "nodes": nodes,
             "edges": edges,
@@ -2160,10 +2037,23 @@ def build_master_orchestrator_flow() -> Dict:
 # =============================================================================
 
 def deploy_enhanced_orchestration():
-    """Deploy the complete enhanced orchestration system."""
+    """Deploy the complete enhanced orchestration system v3."""
     print("=" * 80)
-    print("DEPLOYING ENHANCED MULTI-MODEL ORCHESTRATION SYSTEM v2.0")
+    print("DEPLOYING ENHANCED MULTI-MODEL ORCHESTRATION SYSTEM v3.0")
     print("=" * 80)
+    print("\nMODEL ASSIGNMENTS:")
+    print("  M1  Strategic Planner:     Claude Opus 4.5")
+    print("  M2  Deep Researcher:       Perplexity Sonar Pro")
+    print("  M3  Systems Architect:     GPT-5.2")
+    print("  M4  Implementation Expert: DeepSeek Reasoner")
+    print("  M5  Creative Ideator:      Gemini 3 Pro")
+    print("  M6  Quality Verifier:      GPT-OSS-120B (Groq)")
+    print("  M7  Critical Analyst:      GLM-4.7")
+    print("  M8  Content Editor:        Gemini 3 Flash")
+    print("  M9  Domain Expert:         Kimi K2 (Groq)")
+    print("  M10 Meta-Reasoner:         Claude Sonnet 4.5")
+    print("  M11 Integration Specialist: GPT-5.1")
+    print("  M12 Test Engineer:         DeepSeek Chat")
 
     # Authenticate
     print("\n[1/5] Authenticating with Langflow...")
@@ -2180,7 +2070,7 @@ def deploy_enhanced_orchestration():
     print(f"  Found {len(existing_flows)} existing flows")
 
     # Deploy agent flows
-    print("\n[3/5] Deploying Agent Flows (12 agents)...")
+    print("\n[3/5] Deploying Agent Flows (12 agents, 12 different models)...")
     agent_roles = [
         AgentRole.PLANNER,
         AgentRole.RESEARCHER,
@@ -2199,12 +2089,13 @@ def deploy_enhanced_orchestration():
     for role in agent_roles:
         flow_data = build_single_agent_flow(role)
         flow_name = flow_data["name"]
+        config = AGENT_CONFIGS[role]
 
         if flow_name in existing_names:
-            print(f"  Updating: {flow_name}")
+            print(f"  Updating: {flow_name} ({config['model']})")
             update_flow(headers, existing_names[flow_name], flow_data)
         else:
-            print(f"  Creating: {flow_name}")
+            print(f"  Creating: {flow_name} ({config['model']})")
             create_flow(headers, flow_data)
         time.sleep(0.3)
 
@@ -2250,10 +2141,10 @@ def deploy_enhanced_orchestration():
     print("=" * 80)
     print(f"\nLangflow URL: {LANGFLOW_URL}")
     print("\nDeployed flows:")
-    print("  - 12 Agent flows (M1-M12)")
+    print("  - 12 Agent flows (M1-M12) using 12 DIFFERENT models")
     print("  - 8 Phase flows")
     print("  - 1 Master Orchestrator")
-    print("\nTo use: Open 'V2/Master Orchestrator' in Langflow Playground")
+    print("\nTo use: Open 'V3/Master Orchestrator' in Langflow Playground")
 
     return True
 
