@@ -1,5 +1,11 @@
 FROM langflowai/langflow:latest
 
+# Environment variables for Render deployment
+ENV LANGFLOW_AUTO_LOGIN=true
+ENV LANGFLOW_SKIP_AUTH_AUTO_LOGIN=true
+ENV LANGFLOW_HOST=0.0.0.0
+ENV LANGFLOW_PORT=7860
+
 # Create a startup script that ensures directories exist at runtime
 # This is needed because mounted volumes overwrite image files
 # Render mounts disk at /home/user/.cache/langflow
