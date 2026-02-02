@@ -1,0 +1,13 @@
+{
+  "content": "The review of existing multiagent flow implementations and patterns has shown that multi-agent systems in software engineering are effective for handling complex tasks through collaboration among autonomous agents. They use Large Language Models to enhance cognitive abilities and adhere to frameworks and standards such as JADE and FIPA. Communication and coordination among agents are typically achieved through handoff-based mechanisms, and technical implementations often involve agents returning Command objects to specify subsequent actions. This approach has been proven to outperform single-agent systems and is utilized by major companies like Google Cloud for various applications including supply chain management, customer service, and software development.\n",
+  "metadata": {
+    "task_id": "task_4e46c234",
+    "executor": "planner-3",
+    "worker_id": "worker-4",
+    "mode": "opencode",
+    "exit_code": 0,
+    "ts": "2026-02-02T16:23:02.957418Z",
+    "stream": "stdout"
+  },
+  "hash": "3070209a6c606237"
+}

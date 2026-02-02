@@ -1,0 +1,11 @@
+{
+  "content": "NO-OP complete: planner-2 :: Test MCP server registration API\n",
+  "metadata": {
+    "task_id": "task_6d9e5438",
+    "executor": "planner-2",
+    "worker_id": "worker-1",
+    "mode": "noop",
+    "ts": "2026-01-09T15:18:51.552846Z"
+  },
+  "hash": "28ccf08fe643f2cb"
+}

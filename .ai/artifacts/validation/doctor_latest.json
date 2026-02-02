@@ -1,0 +1,44 @@
+{
+  "ts": "2026-02-02T15:47:20Z",
+  "project_root": "C:\\Users\\yuryz\\Documents\\GitHub\\Langflow",
+  "global_dir": "C:\\Users\\yuryz\\.config\\opencode",
+  "passed": false,
+  "failed_count": 1,
+  "results": [
+    {
+      "check": "shell_windows",
+      "ok": true,
+      "message": "SHELL set: C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+    },
+    {
+      "check": "opencode.json",
+      "ok": true,
+      "message": "opencode.json OK"
+    },
+    {
+      "check": "repair_knowledge_graph",
+      "ok": true,
+      "message": "repair_knowledge_graph OK"
+    },
+    {
+      "check": "knowledge_graph",
+      "ok": true,
+      "message": "knowledge graph canonical"
+    },
+    {
+      "check": "taskbus_connect",
+      "ok": true,
+      "message": "taskbus postgres connect OK"
+    },
+    {
+      "check": "memory_mcp_rpc",
+      "ok": true,
+      "message": "memory_mcp RPC OK"
+    },
+    {
+      "check": "mcp_preflight",
+      "ok": false,
+      "message": "mcp_preflight failed rc=1"
+    }
+  ]
+}

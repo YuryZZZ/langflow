@@ -1,0 +1,322 @@
+{
+  "version": "9.5.0",
+  "last_updated": "2026-02-02T16:34:13.378618",
+  "models": {
+    "orchestrator": {
+      "display_name": "Master Orchestrator - Kimi K2.5",
+      "provider": "moonshot",
+      "model": "kimi-k2.5",
+      "api_key_env": "MOONSHOT_API_KEY",
+      "base_url": "https://api.moonshot.ai/v1",
+      "context_window": 256000,
+      "max_tokens": 32000,
+      "temperature": 1.0,
+      "capabilities": [
+        "orchestration",
+        "planning",
+        "agent_swarm",
+        "parl"
+      ],
+      "internet_access": false,
+      "priority": 1
+    },
+    "researcher": {
+      "display_name": "Researcher - Perplexity Sonar Pro",
+      "provider": "perplexity",
+      "model": "sonar-pro",
+      "api_key_env": "PERPLEXITY_API_KEY",
+      "base_url": "https://api.perplexity.ai",
+      "context_window": 128000,
+      "max_tokens": 64000,
+      "temperature": 0.7,
+      "capabilities": [
+        "web_search",
+        "citations",
+        "real_time",
+        "research"
+      ],
+      "internet_access": true,
+      "search_config": {
+        "mode": "sonar-pro",
+        "citations": true,
+        "recency_days": 30
+      },
+      "priority": 1
+    },
+    "analyst": {
+      "display_name": "Data Analyst - Gemini Pro",
+      "provider": "google",
+      "model": "gemini-3-pro-preview",
+      "api_key_env": "GOOGLE_API_KEY",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "context_window": 1000000,
+      "max_tokens": 64000,
+      "temperature": 0.6,
+      "capabilities": [
+        "data_analysis",
+        "grounding",
+        "search",
+        "reporting"
+      ],
+      "internet_access": true,
+      "search_config": {
+        "grounding": true,
+        "recency": "recent"
+      },
+      "priority": 2
+    },
+    "planner-1": {
+      "display_name": "P1 - Architect (Gemini Pro)",
+      "provider": "google",
+      "model": "gemini-3-pro-preview",
+      "api_key_env": "GOOGLE_API_KEY",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "context_window": 1000000,
+      "max_tokens": 64000,
+      "temperature": 0.7,
+      "capabilities": [
+        "architecture",
+        "design",
+        "large_context",
+        "search"
+      ],
+      "internet_access": true,
+      "search_config": {
+        "grounding": true,
+        "recency": "default"
+      },
+      "priority": 2
+    },
+    "coder-fast": {
+      "display_name": "Fast Coder - Gemini Flash",
+      "provider": "google",
+      "model": "gemini-3-flash-preview",
+      "api_key_env": "GOOGLE_API_KEY",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "context_window": 1000000,
+      "max_tokens": 64000,
+      "temperature": 0.6,
+      "capabilities": [
+        "fast_coding",
+        "quick_edits",
+        "search"
+      ],
+      "internet_access": true,
+      "priority": 3
+    },
+    "validator": {
+      "display_name": "Validator - Gemini Flash",
+      "provider": "google",
+      "model": "gemini-3-flash-preview",
+      "api_key_env": "GOOGLE_API_KEY",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "context_window": 1000000,
+      "max_tokens": 64000,
+      "temperature": 0.4,
+      "capabilities": [
+        "validation",
+        "cross_check",
+        "fact_checking",
+        "search"
+      ],
+      "internet_access": true,
+      "priority": 2
+    },
+    "planner-2": {
+      "display_name": "P2 - Security (Claude)",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "base_url": "https://api.anthropic.com",
+      "context_window": 200000,
+      "max_tokens": 64000,
+      "temperature": 0.7,
+      "capabilities": [
+        "security",
+        "validation",
+        "reasoning"
+      ],
+      "internet_access": false,
+      "priority": 2
+    },
+    "planner-3": {
+      "display_name": "P3 - Workflow (Kimi)",
+      "provider": "moonshot",
+      "model": "kimi-k2.5",
+      "api_key_env": "MOONSHOT_API_KEY",
+      "base_url": "https://api.moonshot.ai/v1",
+      "context_window": 256000,
+      "max_tokens": 32000,
+      "temperature": 1.0,
+      "capabilities": [
+        "workflow",
+        "creative"
+      ],
+      "internet_access": false,
+      "priority": 2
+    },
+    "planner-4": {
+      "display_name": "P4 - Logic (DeepSeek)",
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "base_url": "https://api.deepseek.com/v1",
+      "context_window": 131072,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "capabilities": [
+        "logic",
+        "algorithms",
+        "complex_reasoning"
+      ],
+      "internet_access": false,
+      "priority": 2
+    },
+    "planner-5": {
+      "display_name": "P5 - Implementation (GLM)",
+      "provider": "zai",
+      "model": "glm-4.7",
+      "api_key_env": "ZAI_API_KEY",
+      "base_url": "https://api.z.ai/api/coding/paas/v4/",
+      "context_window": 200000,
+      "max_tokens": 128000,
+      "temperature": 0.7,
+      "capabilities": [
+        "implementation",
+        "testing",
+        "coding"
+      ],
+      "internet_access": false,
+      "priority": 2
+    },
+    "coder": {
+      "display_name": "Primary Coder - Kimi K2.5",
+      "provider": "moonshot",
+      "model": "kimi-k2.5",
+      "api_key_env": "MOONSHOT_API_KEY",
+      "base_url": "https://api.moonshot.ai/v1",
+      "context_window": 256000,
+      "max_tokens": 32000,
+      "temperature": 0.7,
+      "capabilities": [
+        "coding",
+        "implementation"
+      ],
+      "internet_access": false,
+      "priority": 3
+    },
+    "coder-glm": {
+      "display_name": "Stable Coder - GLM 4.7",
+      "provider": "zai",
+      "model": "glm-4.7",
+      "api_key_env": "ZAI_API_KEY",
+      "base_url": "https://api.z.ai/api/coding/paas/v4/",
+      "context_window": 200000,
+      "max_tokens": 128000,
+      "temperature": 0.6,
+      "capabilities": [
+        "stable_coding",
+        "typescript"
+      ],
+      "internet_access": false,
+      "priority": 3
+    },
+    "coder-deepseek": {
+      "display_name": "Logic Coder - DeepSeek",
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "base_url": "https://api.deepseek.com/v1",
+      "context_window": 131072,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "capabilities": [
+        "complex_logic",
+        "algorithms"
+      ],
+      "internet_access": false,
+      "priority": 3
+    },
+    "tester": {
+      "display_name": "Test Engineer - GLM 4.7",
+      "provider": "zai",
+      "model": "glm-4.7",
+      "api_key_env": "ZAI_API_KEY",
+      "base_url": "https://api.z.ai/api/coding/paas/v4/",
+      "context_window": 200000,
+      "max_tokens": 128000,
+      "temperature": 0.6,
+      "capabilities": [
+        "testing",
+        "qa",
+        "coverage"
+      ],
+      "internet_access": false,
+      "priority": 4
+    },
+    "reviewer": {
+      "display_name": "Code Reviewer - Claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "base_url": "https://api.anthropic.com",
+      "context_window": 200000,
+      "max_tokens": 64000,
+      "temperature": 0.7,
+      "capabilities": [
+        "code_review",
+        "quality"
+      ],
+      "internet_access": false,
+      "priority": 4
+    },
+    "security": {
+      "display_name": "Security Analyst - Claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "base_url": "https://api.anthropic.com",
+      "context_window": 200000,
+      "max_tokens": 64000,
+      "temperature": 0.7,
+      "capabilities": [
+        "security_analysis",
+        "vulnerability_detection"
+      ],
+      "internet_access": false,
+      "priority": 2
+    },
+    "validator-anthropic": {
+      "display_name": "Validator - Claude",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "base_url": "https://api.anthropic.com",
+      "context_window": 200000,
+      "max_tokens": 64000,
+      "temperature": 0.4,
+      "capabilities": [
+        "validation",
+        "cross_check"
+      ],
+      "internet_access": false,
+      "priority": 4
+    },
+    "coder-groq": {
+      "display_name": "Ultra-Fast Coder - Groq",
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile",
+      "api_key_env": "GROQ_API_KEY",
+      "base_url": "https://api.groq.com/openai/v1",
+      "context_window": 128000,
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "capabilities": [
+        "ultra_fast",
+        "bulk_tasks"
+      ],
+      "internet_access": false,
+      "priority": 5
+    }
+  }
+}

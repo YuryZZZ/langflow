@@ -1,0 +1,1118 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "deepseek/deepseek-chat",
+  "tui": {
+    "sidebar": "show",
+    "scroll_speed": 3,
+    "scroll_acceleration": {
+      "enabled": true
+    },
+    "diff_style": "auto"
+  },
+  "instructions": [
+    "SYSTEM.md",
+    "MODELS.md",
+    ".ai/PROJECT_KNOWLEDGE.md"
+  ],
+  "provider": {
+    "zai": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Z.AI (Zhipu GLM)",
+      "options": {
+        "baseURL": "https://api.z.ai/api/coding/paas/v4/"
+      },
+      "models": {
+        "glm-4.6": {
+          "name": "GLM-4.6",
+          "limit": {
+            "context": 200000,
+            "output": 16000
+          }
+        },
+        "glm-4.7": {
+          "name": "GLM-4.7",
+          "limit": {
+            "context": 256000,
+            "output": 32000
+          }
+        }
+      }
+    },
+    "deepseek": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "DeepSeek",
+      "options": {
+        "baseURL": "https://api.deepseek.com/v1"
+      },
+      "models": {
+        "deepseek-chat": {
+          "name": "DeepSeek V3.2",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "deepseek-reasoner": {
+          "name": "DeepSeek V3.2 Thinking",
+          "limit": {
+            "context": 128000,
+            "output": 64000
+          }
+        }
+      }
+    },
+    "openai": {
+      "npm": "@ai-sdk/openai",
+      "name": "OpenAI",
+      "models": {
+        "gpt-5.2": {
+          "name": "GPT-5.2 Thinking",
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          }
+        },
+        "gpt-5.1": {
+          "name": "GPT-5.1",
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          }
+        },
+        "gpt-5.1-codex": {
+          "name": "GPT-5.1 Codex",
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          }
+        }
+      }
+    },
+    "google": {
+      "npm": "@ai-sdk/google",
+      "name": "Google",
+      "models": {
+        "gemini-3-flash-preview": {
+          "name": "Gemini 3 Flash",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        },
+        "gemini-3-pro-preview": {
+          "name": "Gemini 3 Pro",
+          "limit": {
+            "context": 1000000,
+            "output": 64000
+          }
+        }
+      }
+    },
+    "anthropic": {
+      "npm": "@ai-sdk/anthropic",
+      "name": "Anthropic",
+      "models": {
+        "claude-sonnet-4-5-20250514": {
+          "name": "Claude Sonnet 4.5",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        },
+        "claude-haiku-4-5-20250514": {
+          "name": "Claude Haiku 4.5",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        },
+        "claude-opus-4-5-20250514": {
+          "name": "Claude Opus 4.5",
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        }
+      }
+    },
+    "groq": {
+      "npm": "@ai-sdk/groq",
+      "name": "Groq",
+      "models": {
+        "llama-3.3-70b-versatile": {
+          "name": "Llama 3.3 70B",
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          }
+        },
+        "llama-3.1-8b-instant": {
+          "name": "Llama 3.1 8B Instant",
+          "limit": {
+            "context": 131072,
+            "output": 8000
+          }
+        },
+        "moonshotai/kimi-k2-instruct-0905": {
+          "name": "Kimi K2 Instruct",
+          "limit": {
+            "context": 256000,
+            "output": 32000
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "name": "GPT-OSS 120B",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        }
+      }
+    },
+    "perplexity": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Perplexity",
+      "options": {
+        "baseURL": "https://api.perplexity.ai"
+      },
+      "models": {
+        "sonar-pro": {
+          "name": "Sonar Pro",
+          "limit": {
+            "context": 127000,
+            "output": 8000
+          }
+        }
+      }
+    }
+  },
+  "agent": {
+    "orchestrator": {
+      "model": "openai/gpt-5.2",
+      "description": "ORCHESTRATOR v8.0 - SWARM COORDINATOR (NO MONITOR REQUIRED)\n\nARCHITECTURE v8.0:\n- Parallel MCP auto-starts background workers on first dispatch\n- NO separate MONITOR window needed\n- Tasks are processed automatically by daemon workers\n- NEVER wait - always dispatch async and continue\n\nPERSISTENT STORAGE:\n- memory: .ai/knowledge-graph.json\n- sequential-thinking: .ai/sequential-thinking.json\n- codebase-map: .ai/codebase-map.db\n- taskbus: PostgreSQL opencode_taskbus.tasks\n- context-compactor: PostgreSQL conversation_history\n\nMANDATORY WORKFLOW:\n1. memory.search_nodes(query) - check existing knowledge\n2. sequential-thinking.list_thinking_chains() - check past reasoning\n3. IF cache hit: Use existing knowledge\n4. IF cache miss: taskbus.create_run() then parallel.parallel_dispatch_planners()\n5. DO NOT WAIT - background workers process automatically\n6. Continue working, check taskbus.get_run_status() periodically\n7. memory.create_entities() to store new knowledge\n\nCRITICAL RULES:\n- DELEGATE everything - you are a ROUTER not a DOER\n- Tasks execute automatically via parallel MCP daemon workers\n- Keep dispatching, keep working, never stop until done\n\nALLOWED MCP CALLS:\n- memory.*, sequential-thinking.*, taskbus.*, parallel.*, context-compactor.*\n\nFORBIDDEN - DELEGATE TO PLANNERS:\n- fetch, perplexity, tavily, playwright, codebase-map, edit, write, bash",
+      "fallbacks": [
+        "google/gemini-3-pro-preview",
+        "anthropic/claude-sonnet-4-5-20250514",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.2,
+      "maxSteps": 100,
+      "maxTokens": 4096,
+      "autoCompact": true,
+      "compactThreshold": 0.75,
+      "mcpAllowlist": ["memory", "taskbus", "parallel", "context-compactor", "sequential-thinking"],
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "mcp": "allow",
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny",
+        "webfetch": "deny"
+      }
+    },
+    "planner-1": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "PLANNER (Google) - 1M context.\n\nWORKFLOW:\n1. memory.search_nodes() - check knowledge graph\n2. sequential-thinking.search_thinking_chains() - check past reasoning\n3. codebase-map.search() - check code structure\n4. IF cache miss: fetch/perplexity/tavily for research\n5. memory.create_entities() - store findings\n6. sequential-thinking.sequentialthinking() - complex reasoning\n7. parallel.parallel_dispatch_workers() - dispatch to workers\n\nWorkers auto-execute via daemon threads. Keep working until done.",
+      "fallbacks": [
+        "anthropic/claude-sonnet-4-5-20250514",
+        "deepseek/deepseek-reasoner",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-2": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "PLANNER (Anthropic) - CoT reasoning.\n\nWORKFLOW:\n1. memory.search_nodes() - check knowledge graph FIRST\n2. sequential-thinking.search_thinking_chains() - check past reasoning\n3. IF found: REUSE existing knowledge\n4. IF not found: fetch/perplexity/tavily for research\n5. memory.create_entities() - store new findings\n6. parallel.parallel_dispatch_workers() - dispatch to workers\n\nWorkers auto-execute via daemon threads. Keep working until done.",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-3": {
+      "model": "openai/gpt-5.2",
+      "description": "PLANNER (OpenAI) - Multi-step.\n\nPERSISTENT STORAGE (project .ai folder):\n- .ai/knowledge-graph.json - entities via memory MCP\n- .ai/sequential-thinking.json - reasoning chains\n- .ai/codebase-map.db - code structure\n- PostgreSQL - task history & conversations\n\nWORKFLOW:\n1. memory.search_nodes(query) - check knowledge graph FIRST\n2. sequential-thinking.search_thinking_chains(query) - check past reasoning\n3. IF found: REUSE existing knowledge\n4. IF not found: research via fetch/perplexity/tavily\n5. memory.create_entities() to STORE new findings\n6. parallel.parallel_dispatch_workers() to execute",
+      "fallbacks": [
+        "google/gemini-3-pro-preview",
+        "deepseek/deepseek-reasoner",
+        "anthropic/claude-sonnet-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 128000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-4": {
+      "model": "deepseek/deepseek-reasoner",
+      "description": "PLANNER (DeepSeek) - Math & logic.\n\nPERSISTENT STORAGE (project .ai folder):\n- .ai/knowledge-graph.json - entities via memory MCP\n- .ai/sequential-thinking.json - reasoning chains\n- .ai/codebase-map.db - code structure\n- PostgreSQL - task history & conversations\n\nWORKFLOW:\n1. memory.search_nodes(query) - check knowledge graph FIRST\n2. sequential-thinking.search_thinking_chains(query) - check past reasoning\n3. IF found: REUSE existing knowledge\n4. IF not found: research via fetch/perplexity/tavily\n5. memory.create_entities() to STORE new findings\n6. parallel.parallel_dispatch_workers() to execute",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "zai/glm-4.7",
+        "google/gemini-3-pro-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-5": {
+      "model": "zai/glm-4.7",
+      "description": "PLANNER (Z.AI) - Agentic.\n\nPERSISTENT STORAGE (project .ai folder):\n- .ai/knowledge-graph.json - entities via memory MCP\n- .ai/sequential-thinking.json - reasoning chains\n- .ai/codebase-map.db - code structure\n- PostgreSQL - task history & conversations\n\nWORKFLOW:\n1. memory.search_nodes(query) - check knowledge graph FIRST\n2. sequential-thinking.search_thinking_chains(query) - check past reasoning\n3. IF found: REUSE existing knowledge\n4. IF not found: research via fetch/perplexity/tavily\n5. memory.create_entities() to STORE new findings\n6. parallel.parallel_dispatch_workers() to execute",
+      "fallbacks": [
+        "google/gemini-3-pro-preview",
+        "anthropic/claude-sonnet-4-5-20250514",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "coder": {
+      "model": "zai/glm-4.7",
+      "description": "CODER (Z.AI) - Primary agentic coding.",
+      "fallbacks": [
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview",
+        "groq/llama-3.3-70b-versatile"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-fast": {
+      "model": "google/gemini-3-flash-preview",
+      "description": "CODER (Google) - Fast edits.",
+      "fallbacks": [
+        "groq/llama-3.3-70b-versatile",
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 65536,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-ts": {
+      "model": "zai/glm-4.7",
+      "description": "CODER (Z.AI) - TypeScript specialist.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview",
+        "deepseek/deepseek-chat",
+        "groq/llama-3.3-70b-versatile"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-deepseek": {
+      "model": "deepseek/deepseek-chat",
+      "description": "CODER (DeepSeek) - Complex logic.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "google/gemini-3-flash-preview",
+        "groq/llama-3.3-70b-versatile"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 8192,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-groq": {
+      "model": "groq/llama-3.3-70b-versatile",
+      "description": "CODER (Groq) - Ultra-fast coding.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 32768,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "build": {
+      "model": "openai/gpt-5.1-codex",
+      "description": "BUILD (OpenAI) - Autonomous builds.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 200,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "tester": {
+      "model": "zai/glm-4.7",
+      "description": "TESTER (Z.AI) - Test generation.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview",
+        "anthropic/claude-haiku-4-5-20250514",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "reviewer": {
+      "model": "zai/glm-4.7",
+      "description": "REVIEWER (Z.AI) - Code review.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview",
+        "anthropic/claude-haiku-4-5-20250514",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 30,
+      "maxTokens": 32000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "validator": {
+      "model": "google/gemini-3-flash-preview",
+      "description": "VALIDATOR (Google) - Cross-validation.",
+      "fallbacks": [
+        "anthropic/claude-haiku-4-5-20250514",
+        "zai/glm-4.7",
+        "groq/llama-3.3-70b-versatile"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 30,
+      "maxTokens": 65536,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "validator-anthropic": {
+      "model": "anthropic/claude-haiku-4-5-20250514",
+      "description": "VALIDATOR (Anthropic) - Backup validation.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview",
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 30,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "security": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "SECURITY (Anthropic) - OWASP analysis.",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "google/gemini-3-pro-preview",
+        "deepseek/deepseek-reasoner"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "debugger": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "DEBUGGER (Google) - Root cause analysis.",
+      "fallbacks": [
+        "deepseek/deepseek-reasoner",
+        "openai/gpt-5.2",
+        "anthropic/claude-sonnet-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "bash": true,
+        "glob": true,
+        "grep": true,
+        "edit": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "analyst": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "ANALYST (Google) - Architecture review.",
+      "fallbacks": [
+        "anthropic/claude-opus-4-5-20250514",
+        "openai/gpt-5.2",
+        "deepseek/deepseek-reasoner"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "researcher": {
+      "model": "zai/glm-4.7",
+      "description": "RESEARCHER (Z.AI) - Deep web research.",
+      "fallbacks": [
+        "perplexity/sonar-pro",
+        "google/gemini-3-flash-preview",
+        "groq/moonshotai/kimi-k2-instruct-0905"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 30,
+      "maxTokens": 32000,
+      "tools": {
+        "read": true,
+        "webfetch": true,
+        "mcp": true
+      }
+    },
+    "search": {
+      "model": "perplexity/sonar-pro",
+      "description": "SEARCH (Perplexity) - Fact-checking.",
+      "fallbacks": [
+        "groq/moonshotai/kimi-k2-instruct-0905",
+        "zai/glm-4.7",
+        "google/gemini-3-flash-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 20,
+      "maxTokens": 8000,
+      "tools": {
+        "read": true,
+        "webfetch": true,
+        "mcp": true
+      }
+    },
+    "deepseek-think": {
+      "model": "deepseek/deepseek-reasoner",
+      "description": "THINKER (DeepSeek) - Chain-of-thought.",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "anthropic/claude-opus-4-5-20250514",
+        "google/gemini-3-pro-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "edit": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "kimi": {
+      "model": "groq/moonshotai/kimi-k2-instruct-0905",
+      "description": "KIMI - Kimi K2. Creative alternatives.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "perplexity/sonar-pro"
+      ],
+      "mode": "primary",
+      "temperature": 0.6,
+      "maxSteps": 50,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "reasoner": {
+      "model": "groq/openai/gpt-oss-120b",
+      "description": "REASONER - GPT-OSS 120B. Fast reasoning.",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "anthropic/claude-opus-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 1.0,
+      "maxSteps": 50,
+      "maxTokens": 8192,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "mass-worker": {
+      "model": "groq/llama-3.3-70b-versatile",
+      "description": "MASS WORKER - Llama 3.3 70B. Bulk processing.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "groq/llama-3.1-8b-instant"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 32768,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "cheap-worker": {
+      "model": "groq/llama-3.1-8b-instant",
+      "description": "CHEAP WORKER - Llama 3.1 8B. TRIVIAL TASKS ONLY.",
+      "fallbacks": [
+        "groq/llama-3.3-70b-versatile",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 20,
+      "maxTokens": 8000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "claude-haiku": {
+      "model": "anthropic/claude-haiku-4-5-20250514",
+      "description": "ESCALATION A - Claude Haiku 4.5.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 30,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "claude-sonnet": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "ESCALATION TIER A - Claude Sonnet 4.5.",
+      "fallbacks": [
+        "anthropic/claude-opus-4-5-20250514",
+        "openai/gpt-5.2"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "claude-opus": {
+      "model": "anthropic/claude-opus-4-5-20250514",
+      "description": "ESCALATION TIER S - Claude Opus 4.5. CRITICAL ONLY.",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "human"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gpt-5.2": {
+      "model": "openai/gpt-5.2",
+      "description": "ESCALATION - GPT-5.2 Thinking.",
+      "fallbacks": [
+        "google/gemini-3-pro-preview",
+        "human"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 128000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gpt-5.1": {
+      "model": "openai/gpt-5.1",
+      "description": "ESCALATION - GPT-5.1.",
+      "fallbacks": [
+        "openai/gpt-5.1-codex",
+        "human"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 128000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gemini-pro": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "ESCALATION - Gemini 3 Pro. 1M context.",
+      "fallbacks": [
+        "openai/gpt-5.2",
+        "human"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gemini-flash": {
+      "model": "google/gemini-3-flash-preview",
+      "description": "ESCALATION - Gemini 3 Flash.",
+      "fallbacks": [
+        "google/gemini-3-pro-preview",
+        "human"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 65536,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    }
+  },
+  "command": {
+    "auto": {
+      "template": "$ARGUMENTS\n\nEXECUTE FULL SWARM WORKFLOW v8.0 (NO MONITOR):\n1. taskbus.create_run() - start new run\n2. memory.search_nodes() - check existing knowledge\n3. parallel.parallel_dispatch_planners() - dispatch to 5 planners\n4. Tasks auto-execute via daemon workers (no waiting)\n5. taskbus.get_run_status() - check progress\n6. memory.create_entities() - store new knowledge\n7. Continue until fully complete - NEVER stop early\n\nARCHITECTURE: parallel MCP auto-starts 8 daemon workers\nWORKFLOW: orchestrator -> planners[5] -> workers[5+] (all async)\nRULE: Keep working until task is FULLY DONE",
+      "description": "Async parallel swarm v8.0 - no monitor required",
+      "agent": "orchestrator"
+    },
+    "fast": {
+      "template": "$ARGUMENTS\n\nFAST MODE (skip planner):\n1. Call taskbus.create_task()\n2. Dispatch directly to @coder-fast\n3. Dispatch to @validator for cross-model validation\n4. Call taskbus.complete_task()\n5. Return result",
+      "description": "Fast execution - skip planner using PostgreSQL TaskBus",
+      "agent": "orchestrator"
+    },
+    "debug": {
+      "template": "$ARGUMENTS\n\nDEBUG MODE:\n1. Call sequential-thinking.sequentialthinking() for chain-of-thought\n2. Dispatch to @debugger (Google/Gemini 3 Pro)\n3. Deep root cause analysis\n4. Return findings and fix recommendations",
+      "description": "Deep debugging with chain-of-thought",
+      "agent": "debugger"
+    },
+    "route": {
+      "template": "$ARGUMENTS\n\nROUTING ANALYSIS:\n1. Analyze task complexity (1-10 scale)\n2. Check taskbus.get_recommended_coder(complexity)\n3. Return recommended: coder, validator, escalation path",
+      "description": "Get complexity score and optimal routing",
+      "agent": "orchestrator"
+    },
+    "plan": {
+      "template": "$ARGUMENTS\n\nPLAN ONLY (no execution):\n1. taskbus.create_run()\n2. parallel.parallel_dispatch_planners() - planners auto-execute\n3. taskbus.get_run_status() - check progress\n4. Synthesize proposals into master plan\n5. Return plan for user approval",
+      "description": "Create parallel architectural plan without executing",
+      "agent": "orchestrator"
+    },
+    "stop": {
+      "template": "SHUTDOWN SEQUENCE:\n1. Call context-compactor.context_compact_now() to save conversation\n2. Notify user: 'Context saved. Run stop.bat in terminal to terminate all processes.'\n3. DO NOT execute any more tasks after this command.",
+      "description": "Save context and prepare for shutdown (any active agent)"
+    },
+    "compact": {
+      "template": "COMPACT CONTEXT NOW:\n1. Call context-compactor.context_compact_now() to compress conversation history\n2. Call context-compactor.context_get_stats() to show new utilization\n3. Report: 'Context compacted. New utilization: X%'",
+      "description": "Force context compaction to free space",
+      "agent": "orchestrator"
+    }
+  },
+  "tools": {
+    "edit": true,
+    "bash": true,
+    "glob": true,
+    "grep": true,
+    "read": true,
+    "write": true,
+    "webfetch": true,
+    "task": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "task": "allow",
+    "read": "allow",
+    "write": "allow",
+    "glob": "allow",
+    "grep": "allow"
+  },
+  "mcp": {
+    "taskbus": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/postgres_mcp.py"
+      ],
+      "environment": {
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_DB": "opencode_taskbus",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "postgres"
+      },
+      "enabled": true,
+      "timeout": 600000
+    },
+    "parallel": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/parallel_mcp.py"
+      ],
+      "enabled": true,
+      "timeout": 600000
+    },
+    "memory": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-memory\\dist\\index.js",
+        "--memory-file-path",
+        ".ai/knowledge-graph.json"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/sequential_thinking_persistent.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "filesystem": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js",
+        "."
+      ],
+      "enabled": true
+    },
+    "github": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\github-mcp\\dist\\index.js"
+      ],
+      "enabled": true
+    },
+    "fetch": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\mcp-fetch-server\\dist\\index.js"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "codebase-map": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\mcp-codebase-map\\dist\\index.js",
+        ".",
+        "--db-path",
+        ".ai/codebase-map.db"
+      ],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "postgres": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-postgres\\dist\\index.js",
+        "postgresql://postgres:postgres@localhost:5432/opencode_taskbus"
+      ],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@playwright\\mcp\\cli.js",
+        "--headless"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "computer-control": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\computer-use-mcp\\dist\\main.js"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "tavily": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/tavily_mcp.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "perplexity": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/perplexity_mcp.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "apify": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\npx.cmd",
+        "-y",
+        "@apify/actors-mcp-server"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "context-compactor": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/context_compactor.py"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "display_name": "Data Analyst - Gemini Pro",
+  "provider": "google",
+  "model": "gemini-3-pro-preview",
+  "api_key_env": "GOOGLE_API_KEY",
+  "base_url": "https://generativelanguage.googleapis.com/v1beta",
+  "context_window": 1000000,
+  "max_tokens": 64000,
+  "temperature": 0.6,
+  "capabilities": [
+    "data_analysis",
+    "grounding",
+    "search",
+    "reporting"
+  ],
+  "internet_access": true,
+  "search_config": {
+    "grounding": true,
+    "recency": "recent"
+  },
+  "priority": 2
+}

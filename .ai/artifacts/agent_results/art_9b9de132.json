@@ -1,0 +1,13 @@
+{
+  "content": "",
+  "metadata": {
+    "task_id": "task_f7b49139",
+    "executor": "planner-2",
+    "worker_id": "worker-5",
+    "mode": "opencode",
+    "exit_code": 0,
+    "ts": "2026-02-02T16:06:48.862798Z",
+    "stream": "stdout"
+  },
+  "hash": "e3b0c44298fc1c14"
+}

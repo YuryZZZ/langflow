@@ -1,0 +1,11 @@
+{
+  "content": "Timeout after 300s\n",
+  "metadata": {
+    "task_id": "task_4fd3ea18",
+    "executor": "planner-4",
+    "worker_id": "worker-1",
+    "mode": "timeout",
+    "ts": "2026-02-02T15:36:08.272342Z"
+  },
+  "hash": "62c7699816b7ebae"
+}

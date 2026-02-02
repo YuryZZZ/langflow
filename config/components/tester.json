@@ -1,0 +1,17 @@
+{
+  "display_name": "Test Engineer - GLM 4.7",
+  "provider": "zai",
+  "model": "glm-4.7",
+  "api_key_env": "ZAI_API_KEY",
+  "base_url": "https://api.z.ai/api/coding/paas/v4/",
+  "context_window": 200000,
+  "max_tokens": 128000,
+  "temperature": 0.6,
+  "capabilities": [
+    "testing",
+    "qa",
+    "coverage"
+  ],
+  "internet_access": false,
+  "priority": 4
+}

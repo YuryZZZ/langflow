@@ -1,0 +1,13 @@
+{
+  "content": "1073 |     const info = provider.models[modelID]\n1074 |     if (!info) {\n1075 |       const availableModels = Object.keys(provider.models)\n1076 |       const matches = fuzzysort.go(modelID, availableModels, { limit: 3, threshold: -10000 })\n1077 |       const suggestions = matches.map((m) => m.target)\n1078 |       throw new ModelNotFoundError({ providerID, modelID, suggestions })\n                   ^\nProviderModelNotFoundError: ProviderModelNotFoundError\n data: {\n  providerID: \"anthropic\",\n  modelID: \"claude-sonnet-4-5-20250514\",\n  suggestions: [],\n},\n\n      at getModel (src/provider/provider.ts:1078:13)\n\n",
+  "metadata": {
+    "task_id": "task_f7b49139",
+    "executor": "planner-2",
+    "worker_id": "worker-5",
+    "mode": "opencode",
+    "exit_code": 0,
+    "ts": "2026-02-02T16:06:48.862798Z",
+    "stream": "stderr"
+  },
+  "hash": "1ede72b85532a509"
+}

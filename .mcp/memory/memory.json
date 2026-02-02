@@ -1,0 +1,26 @@
+{
+  "entities": [
+    {
+      "name": "Project",
+      "entityType": "project",
+      "observations": [
+        "Name: opencode",
+        "Path: C:\\Users\\yuryz\\.config\\opencode",
+        "Status: Active"
+      ]
+    },
+    {
+      "name": "OpenCode System",
+      "entityType": "system",
+      "observations": [
+        "Architecture: Hyper-Parallel Swarm",
+        "TaskBus: PostgreSQL",
+        "Parallel: 5 planners x 5 workers (25 agents)",
+        "MCP Servers: memory, sequential-thinking, filesystem, codebase-map, postgres, taskbus, parallel, playwright, computer-use"
+      ]
+    }
+  ],
+  "relations": [
+    { "from": "Project", "to": "OpenCode System", "relationType": "uses" }
+  ]
+}

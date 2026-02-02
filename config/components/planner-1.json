@@ -1,0 +1,22 @@
+{
+  "display_name": "P1 - Architect (Gemini Pro)",
+  "provider": "google",
+  "model": "gemini-3-pro-preview",
+  "api_key_env": "GOOGLE_API_KEY",
+  "base_url": "https://generativelanguage.googleapis.com/v1beta",
+  "context_window": 1000000,
+  "max_tokens": 64000,
+  "temperature": 0.7,
+  "capabilities": [
+    "architecture",
+    "design",
+    "large_context",
+    "search"
+  ],
+  "internet_access": true,
+  "search_config": {
+    "grounding": true,
+    "recency": "default"
+  },
+  "priority": 2
+}

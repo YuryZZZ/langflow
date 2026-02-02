@@ -1,0 +1,280 @@
+{
+  "name": "Hybrid Multi-Model Orchestration - OpenCode v9.5",
+  "description": "Fully connected hybrid multiflow with correct OpenCode models (Kimi K2.5, Gemini 3, GLM-4.7, DeepSeek, Claude, Perplexity)",
+  "version": "9.5.0",
+  "created": "2026-02-02",
+  "updated": "2026-02-02",
+  "opencode_version": "9.5",
+  "components": [
+    {
+      "id": "orchestrator_node",
+      "type": "HybridAgent",
+      "name": "Master Orchestrator",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Kimi K2.5 (1T MoE, 256K context) - Primary orchestrator with PARL Agent Swarm",
+      "config": {
+        "task_description": "Coordinate multi-agent parallel execution",
+        "max_parallel_workers": 10,
+        "enable_validation": true,
+        "capabilities": ["parl_decompose_task", "parl_spawn_subagent", "parl_aggregate_results"]
+      },
+      "position": { "x": 500, "y": 100 }
+    },
+    {
+      "id": "planner_1",
+      "type": "Agent",
+      "name": "P1 - Gemini 3 Pro",
+      "model": "google/gemini-3-pro",
+      "description": "Architecture & Data Analysis - 1M context",
+      "config": { "role": "architect", "specialty": "system_design" },
+      "position": { "x": 100, "y": 300 }
+    },
+    {
+      "id": "planner_2",
+      "type": "Agent",
+      "name": "P2 - Claude Sonnet 4.5",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Security & Validation - 200K context",
+      "config": { "role": "security", "specialty": "validation" },
+      "position": { "x": 250, "y": 300 }
+    },
+    {
+      "id": "planner_3",
+      "type": "Agent",
+      "name": "P3 - Kimi K2.5",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Workflow & Creative - 256K context",
+      "config": { "role": "creative", "specialty": "workflow" },
+      "position": { "x": 400, "y": 300 }
+    },
+    {
+      "id": "planner_4",
+      "type": "Agent",
+      "name": "P4 - DeepSeek V3.2",
+      "model": "deepseek/deepseek-chat",
+      "description": "Logic & Algorithms - 131K context",
+      "config": { "role": "logician", "specialty": "algorithms" },
+      "position": { "x": 550, "y": 300 }
+    },
+    {
+      "id": "planner_5",
+      "type": "Agent",
+      "name": "P5 - GLM-4.7",
+      "model": "zai/glm-4.7",
+      "description": "Implementation & Testing - 200K context",
+      "config": { "role": "implementer", "specialty": "coding" },
+      "position": { "x": 700, "y": 300 }
+    },
+    {
+      "id": "coder_fast",
+      "type": "Agent",
+      "name": "Fast Coder - Gemini Flash",
+      "model": "google/gemini-3-flash",
+      "description": "Ultra-fast edits - 1M context, <2s response",
+      "config": { "role": "fast_coder", "max_tokens": 64000 },
+      "position": { "x": 100, "y": 500 }
+    },
+    {
+      "id": "coder_primary",
+      "type": "Agent",
+      "name": "Primary Coder - Kimi K2.5",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Main implementation - 256K context, 32K output",
+      "config": { "role": "primary_coder", "temperature": 0.7 },
+      "position": { "x": 250, "y": 500 }
+    },
+    {
+      "id": "coder_glm",
+      "type": "Agent",
+      "name": "Stable Coder - GLM-4.7",
+      "model": "zai/glm-4.7",
+      "description": "Stable implementation - 200K context",
+      "config": { "role": "stable_coder", "temperature": 0.6 },
+      "position": { "x": 400, "y": 500 }
+    },
+    {
+      "id": "coder_deepseek",
+      "type": "Agent",
+      "name": "Logic Coder - DeepSeek",
+      "model": "deepseek/deepseek-chat",
+      "description": "Complex logic & algorithms - 131K context",
+      "config": { "role": "logic_coder", "specialty": "complex" },
+      "position": { "x": 550, "y": 500 }
+    },
+    {
+      "id": "tester",
+      "type": "Agent",
+      "name": "Test Engineer - GLM-4.7",
+      "model": "zai/glm-4.7",
+      "description": "Testing and QA - 200K context",
+      "config": { "role": "tester", "coverage_target": 90 },
+      "position": { "x": 700, "y": 500 }
+    },
+    {
+      "id": "reviewer",
+      "type": "Agent",
+      "name": "Code Reviewer - Claude",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Code review and quality - 200K context",
+      "config": { "role": "reviewer", "cross_model": true },
+      "position": { "x": 850, "y": 500 }
+    },
+    {
+      "id": "security",
+      "type": "Agent",
+      "name": "Security Analyst - Claude",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Security analysis and vulnerability detection",
+      "config": { "role": "security", "specialty": "audit" },
+      "position": { "x": 1000, "y": 500 }
+    },
+    {
+      "id": "researcher",
+      "type": "Agent",
+      "name": "Researcher - Perplexity",
+      "model": "perplexity/sonar-pro",
+      "description": "Web research with citations - 128K context",
+      "config": { "role": "researcher", "citations": true },
+      "position": { "x": 100, "y": 700 }
+    },
+    {
+      "id": "analyst",
+      "type": "Agent",
+      "name": "Data Analyst - Gemini Pro",
+      "model": "google/gemini-3-pro",
+      "description": "Analysis and data processing - 1M context",
+      "config": { "role": "analyst", "data_processing": true },
+      "position": { "x": 250, "y": 700 }
+    },
+    {
+      "id": "validator_google",
+      "type": "Agent",
+      "name": "Validator - Gemini Flash",
+      "model": "google/gemini-3-flash",
+      "description": "Cross-model validation - Google family",
+      "config": { "role": "validator", "provider": "google" },
+      "position": { "x": 400, "y": 700 }
+    },
+    {
+      "id": "validator_anthropic",
+      "type": "Agent",
+      "name": "Validator - Claude",
+      "model": "anthropic/claude-haiku-4-5",
+      "description": "Cross-model validation - Anthropic family",
+      "config": { "role": "validator", "provider": "anthropic" },
+      "position": { "x": 550, "y": 700 }
+    },
+    {
+      "id": "memory_component",
+      "type": "MemoryComponent",
+      "name": "Shared Memory",
+      "description": "Cross-layer memory persistence via MCP",
+      "config": {
+        "memory_key": "hybrid_execution_context",
+        "return_messages": true,
+        "mcp_enabled": true
+      },
+      "position": { "x": 500, "y": 900 }
+    },
+    {
+      "id": "output_aggregator",
+      "type": "CustomComponent",
+      "name": "Results Aggregator",
+      "description": "Aggregates results from all parallel agents",
+      "config": {
+        "aggregation_strategy": "weighted_merge",
+        "validation_required": true
+      },
+      "position": { "x": 500, "y": 1100 }
+    }
+  ],
+  "edges": [
+    { "source": "orchestrator_node", "target": "planner_1", "type": "dispatches" },
+    { "source": "orchestrator_node", "target": "planner_2", "type": "dispatches" },
+    { "source": "orchestrator_node", "target": "planner_3", "type": "dispatches" },
+    { "source": "orchestrator_node", "target": "planner_4", "type": "dispatches" },
+    { "source": "orchestrator_node", "target": "planner_5", "type": "dispatches" },
+    { "source": "planner_1", "target": "coder_fast", "type": "routes" },
+    { "source": "planner_1", "target": "analyst", "type": "routes" },
+    { "source": "planner_2", "target": "security", "type": "routes" },
+    { "source": "planner_2", "target": "reviewer", "type": "routes" },
+    { "source": "planner_3", "target": "coder_primary", "type": "routes" },
+    { "source": "planner_3", "target": "researcher", "type": "routes" },
+    { "source": "planner_4", "target": "coder_deepseek", "type": "routes" },
+    { "source": "planner_5", "target": "coder_glm", "type": "routes" },
+    { "source": "planner_5", "target": "tester", "type": "routes" },
+    { "source": "coder_fast", "target": "memory_component", "type": "writes" },
+    { "source": "coder_primary", "target": "memory_component", "type": "writes" },
+    { "source": "coder_glm", "target": "memory_component", "type": "writes" },
+    { "source": "coder_deepseek", "target": "memory_component", "type": "writes" },
+    { "source": "tester", "target": "memory_component", "type": "writes" },
+    { "source": "reviewer", "target": "memory_component", "type": "writes" },
+    { "source": "security", "target": "memory_component", "type": "writes" },
+    { "source": "researcher", "target": "memory_component", "type": "writes" },
+    { "source": "analyst", "target": "memory_component", "type": "writes" },
+    { "source": "memory_component", "target": "validator_google", "type": "reads" },
+    { "source": "memory_component", "target": "validator_anthropic", "type": "reads" },
+    { "source": "validator_google", "target": "output_aggregator", "type": "validates" },
+    { "source": "validator_anthropic", "target": "output_aggregator", "type": "validates" },
+    { "source": "memory_component", "target": "output_aggregator", "type": "aggregates" }
+  ],
+  "execution_config": {
+    "parallel_execution": true,
+    "max_concurrent_flows": 10,
+    "validation_required": true,
+    "fallback_strategy": "retry_with_different_agent",
+    "timeout_seconds": 3600,
+    "cross_model_validation": true
+  },
+  "model_registry": {
+    "orchestrator": "moonshot/kimi-k2.5",
+    "planners": [
+      "google/gemini-3-pro",
+      "anthropic/claude-sonnet-4-5",
+      "moonshot/kimi-k2.5",
+      "deepseek/deepseek-chat",
+      "zai/glm-4.7"
+    ],
+    "coders": [
+      "google/gemini-3-flash",
+      "moonshot/kimi-k2.5",
+      "zai/glm-4.7",
+      "deepseek/deepseek-chat"
+    ],
+    "validators": [
+      "google/gemini-3-flash",
+      "anthropic/claude-haiku-4-5"
+    ],
+    "specialists": {
+      "tester": "zai/glm-4.7",
+      "reviewer": "anthropic/claude-sonnet-4-5",
+      "security": "anthropic/claude-sonnet-4-5",
+      "researcher": "perplexity/sonar-pro",
+      "analyst": "google/gemini-3-pro"
+    }
+  },
+  "deployment": {
+    "langflow_url": "https://langflow-7vd3.onrender.com",
+    "mcp_endpoint": "https://langflow-7vd3.onrender.com/api/v1/mcp/project/49c3b5d8-c194-443e-a564-a0efc15108b8/streamable",
+    "local_port": 7860,
+    "hybrid_mode": true
+  },
+  "integrations": {
+    "mcp_servers": [
+      "memory",
+      "taskbus",
+      "sequential-thinking",
+      "fetch",
+      "playwright"
+    ],
+    "provider_distribution": {
+      "moonshot": 25,
+      "google": 20,
+      "zai": 20,
+      "deepseek": 15,
+      "anthropic": 12,
+      "groq": 5,
+      "openai": 3
+    }
+  }
+}

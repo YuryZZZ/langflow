@@ -1,0 +1,187 @@
+{
+  "agents": [
+    {
+      "name": "orchestrator",
+      "model": "openai/gpt-5.2",
+      "description": "ORCHESTRATOR - Strategic Leader with Full Reasoning. Decomposes goals, routes tasks, and enforces architecture. GPT-5.2 Thinking with reasoning_effort=high.",
+      "mode": "primary"
+    },
+    {
+      "name": "planner-1",
+      "model": "google/gemini-3-pro-preview",
+      "description": "PLANNER-1 - Architecture & Research. Google Gemini 3 Pro with 1M context.",
+      "mode": "subagent"
+    },
+    {
+      "name": "planner-2",
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "PLANNER-2 - Security & Validation. Claude Sonnet 4.5 for quality assurance.",
+      "mode": "subagent"
+    },
+    {
+      "name": "planner-3",
+      "model": "openai/gpt-5.2",
+      "description": "PLANNER-3 - Workflow & Coordination. GPT-5.2 Thinking for complex planning.",
+      "mode": "subagent"
+    },
+    {
+      "name": "planner-4",
+      "model": "deepseek/deepseek-reasoner",
+      "description": "PLANNER-4 - Logic & Algorithms. DeepSeek Reasoner for CoT reasoning.",
+      "mode": "subagent"
+    },
+    {
+      "name": "planner-5",
+      "model": "zai/glm-4.7",
+      "description": "PLANNER-5 - Implementation & Testing. Z.AI GLM-4.7 for agentic stability.",
+      "mode": "subagent"
+    },
+    {
+      "name": "coder",
+      "model": "zai/glm-4.7",
+      "description": "CODER - Primary Developer. Z.AI GLM-4.7 for production-ready code.",
+      "mode": "subagent"
+    },
+    {
+      "name": "coder-fast",
+      "model": "google/gemini-3-flash-preview",
+      "description": "CODER-FAST - Quick Edits. Google Gemini 3 Flash with 1M context.",
+      "mode": "subagent"
+    },
+    {
+      "name": "coder-deepseek",
+      "model": "deepseek/deepseek-chat",
+      "description": "CODER-DEEPSEEK - Complex Logic. DeepSeek V3 for algorithmic tasks.",
+      "mode": "subagent"
+    },
+    {
+      "name": "coder-ts",
+      "model": "zai/glm-4.7",
+      "description": "CODER-TS - TypeScript Specialist. Z.AI GLM-4.7 for TypeScript/Interfaces.",
+      "mode": "subagent"
+    },
+    {
+      "name": "build",
+      "model": "openai/gpt-5.2",
+      "description": "BUILDER - DevOps Engineer. GPT-5.2 for complex builds and deployment.",
+      "mode": "subagent"
+    },
+    {
+      "name": "tester",
+      "model": "zai/glm-4.7",
+      "description": "TESTER - Test Generation. Z.AI GLM-4.7 for comprehensive testing.",
+      "mode": "subagent"
+    },
+    {
+      "name": "reviewer",
+      "model": "zai/glm-4.7",
+      "description": "REVIEWER - Code Review. Z.AI GLM-4.7 for quality assurance.",
+      "mode": "subagent"
+    },
+    {
+      "name": "validator",
+      "model": "google/gemini-3-flash-preview",
+      "description": "VALIDATOR - Cross-Model Validation. Google Gemini 3 Flash for validation.",
+      "mode": "subagent"
+    },
+    {
+      "name": "security",
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "SECURITY - Security Auditor. Claude Sonnet 4.5 for OWASP analysis.",
+      "mode": "subagent"
+    },
+    {
+      "name": "debugger",
+      "model": "google/gemini-3-pro-preview",
+      "description": "DEBUGGER - Root Cause Analysis. Google Gemini 3 Pro for debugging.",
+      "mode": "subagent"
+    },
+    {
+      "name": "analyst",
+      "model": "google/gemini-3-pro-preview",
+      "description": "ANALYST - Code Analysis. Google Gemini 3 Pro for architecture review.",
+      "mode": "subagent"
+    },
+    {
+      "name": "deepseek-think",
+      "model": "deepseek/deepseek-reasoner",
+      "description": "DEEPSEEK-THINK - CoT Reasoning. DeepSeek Reasoner for complex reasoning.",
+      "mode": "subagent"
+    },
+    {
+      "name": "researcher",
+      "model": "zai/glm-4.7",
+      "description": "RESEARCHER - Information Specialist. Z.AI GLM-4.7 for documentation research.",
+      "mode": "subagent"
+    },
+    {
+      "name": "search",
+      "model": "perplexity/sonar-pro",
+      "description": "SEARCH - Web Research. Perplexity Sonar Pro for real-time web search.",
+      "mode": "subagent"
+    },
+    {
+      "name": "kimi",
+      "model": "moonshot/kimi-k2.5",
+      "description": "KIMI - Creative Specialist. Moonshot Kimi K2.5 for creative alternatives.",
+      "mode": "subagent"
+    },
+    {
+      "name": "reasoner",
+      "model": "groq/openai/gpt-oss-120b",
+      "description": "REASONER - Fast Reasoning. Groq GPT-OSS 120B for quick reasoning.",
+      "mode": "subagent"
+    },
+    {
+      "name": "mass-worker",
+      "model": "groq/llama-3.3-70b-versatile",
+      "description": "MASS-WORKER - Bulk Processing. Groq Llama 3.3 70B for bulk tasks.",
+      "mode": "subagent"
+    },
+    {
+      "name": "cheap-worker",
+      "model": "groq/llama-3.1-8b-instant",
+      "description": "CHEAP-WORKER - Trivial Tasks. Groq Llama 3.1 8B for formatting/comments only.",
+      "mode": "subagent"
+    },
+    {
+      "name": "gemini-pro",
+      "model": "google/gemini-3-pro-preview",
+      "description": "GEMINI-PRO - Complex Analysis. Google Gemini 3 Pro for large codebases.",
+      "mode": "subagent"
+    },
+    {
+      "name": "gemini-flash",
+      "model": "google/gemini-3-flash-preview",
+      "description": "GEMINI-FLASH - Fast Coding. Google Gemini 3 Flash for quick edits.",
+      "mode": "subagent"
+    },
+    {
+      "name": "claude-sonnet",
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "CLAUDE-SONNET - Pro Coder. Claude Sonnet 4.5 for escalation tier A.",
+      "mode": "subagent"
+    },
+    {
+      "name": "claude-haiku",
+      "model": "anthropic/claude-haiku-4-5-20250514",
+      "description": "CLAUDE-HAIKU - Fast Helper. Claude Haiku 4.5 for quick quality checks.",
+      "mode": "subagent"
+    },
+    {
+      "name": "claude-opus",
+      "model": "anthropic/claude-opus-4-5-20250514",
+      "description": "CLAUDE-OPUS - Emergency Only. Claude Opus 4.5 for critical escalation.",
+      "mode": "subagent"
+    },
+    {
+      "name": "gpt-5.2",
+      "model": "openai/gpt-5.2",
+      "description": "GPT-5.2 - Best Reasoning. GPT-5.2 Thinking for complex reasoning.",
+      "mode": "subagent"
+    }
+  ],
+  "count": 29,
+  "timestamp": "2026-01-30",
+  "version": "v8.5.0"
+}

@@ -1,0 +1,150 @@
+{
+  "name": "Hybrid Multilayer Execution Flow",
+  "description": "5-layer hybrid workflow with parallel and sequential execution",
+  "version": "2.0.0",
+  "created": "2026-01-29",
+  "execution_context": {
+    "task": "Develop AI document analysis system",
+    "requirements": [
+      "Process multiple document types",
+      "Extract information using AI",
+      "Provide summarization",
+      "Integrate with existing systems",
+      "Scale to thousands/hour",
+      "Include security controls"
+    ]
+  },
+  "layers": [
+    {
+      "id": "layer1",
+      "name": "Parallel Analysis",
+      "type": "parallel",
+      "max_agents": 8,
+      "tasks": [
+        "Technical analysis",
+        "UX analysis",
+        "Business analysis",
+        "Security analysis",
+        "Performance analysis",
+        "Documentation analysis"
+      ]
+    },
+    {
+      "id": "layer2",
+      "name": "Sequential Design",
+      "type": "sequential",
+      "max_agents": 4,
+      "dependencies": ["layer1"],
+      "tasks": [
+        "Architecture design",
+        "Component design",
+        "Interface design",
+        "Data flow design"
+      ]
+    },
+    {
+      "id": "layer3",
+      "name": "Parallel Implementation",
+      "type": "parallel_groups",
+      "max_agents": 8,
+      "dependencies": ["layer2"],
+      "groups": [
+        {
+          "name": "Frontend",
+          "agents": ["UI Agent", "Interaction Agent"]
+        },
+        {
+          "name": "Backend",
+          "agents": ["API Agent", "Logic Agent"]
+        },
+        {
+          "name": "Database",
+          "agents": ["Schema Agent", "Query Agent"]
+        },
+        {
+          "name": "Infrastructure",
+          "agents": ["Deploy Agent", "Monitor Agent"]
+        }
+      ]
+    },
+    {
+      "id": "layer4",
+      "name": "Sequential Integration",
+      "type": "sequential",
+      "max_agents": 4,
+      "dependencies": ["layer3"],
+      "tasks": [
+        "Integration testing",
+        "System testing",
+        "Performance testing",
+        "Security testing"
+      ]
+    },
+    {
+      "id": "layer5",
+      "name": "Parallel Validation",
+      "type": "parallel",
+      "max_agents": 8,
+      "dependencies": ["layer4"],
+      "tasks": [
+        "Code review",
+        "User acceptance",
+        "Business validation",
+        "Technical validation",
+        "Security validation",
+        "Performance validation"
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "orchestrator",
+      "type": "HybridOrchestrator",
+      "config": {
+        "name": "Multilayer Orchestrator",
+        "execution_mode": "hybrid_multilayer"
+      },
+      "position": { "x": 50, "y": 50 }
+    },
+    {
+      "id": "prompt",
+      "type": "Prompt",
+      "config": {
+        "text": "Execute 5-layer hybrid workflow: 1) Parallel analysis (6 agents), 2) Sequential design (4 agents), 3) Parallel implementation (8 agents in 4 groups), 4) Sequential integration (4 agents), 5) Parallel validation (6 agents)."
+      },
+      "position": { "x": 50, "y": 200 }
+    },
+    {
+      "id": "results",
+      "type": "Output",
+      "config": {
+        "name": "Final Results",
+        "format": "comprehensive_report"
+      },
+      "position": { "x": 800, "y": 200 }
+    }
+  ],
+  "edges": [
+    {
+      "source": "prompt",
+      "sourceHandle": "output",
+      "target": "orchestrator",
+      "targetHandle": "input"
+    },
+    {
+      "source": "orchestrator",
+      "sourceHandle": "output",
+      "target": "results",
+      "targetHandle": "input"
+    }
+  ],
+  "execution_config": {
+    "mode": "hybrid_multilayer",
+    "total_layers": 5,
+    "max_total_agents": 30,
+    "parallel_layers": [1, 3, 5],
+    "sequential_layers": [2, 4],
+    "quality_gates": true,
+    "timeout_seconds": 3600
+  }
+}

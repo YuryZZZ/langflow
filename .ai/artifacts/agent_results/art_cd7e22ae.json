@@ -1,0 +1,11 @@
+{
+  "content": "Timeout after 60s\n",
+  "metadata": {
+    "task_id": "task_a79c8823",
+    "executor": "orchestrator",
+    "worker_id": "worker-4",
+    "mode": "timeout",
+    "ts": "2026-02-02T16:21:57.881232Z"
+  },
+  "hash": "282ff4583a24626a"
+}

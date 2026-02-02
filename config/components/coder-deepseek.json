@@ -1,0 +1,16 @@
+{
+  "display_name": "Logic Coder - DeepSeek",
+  "provider": "deepseek",
+  "model": "deepseek-chat",
+  "api_key_env": "DEEPSEEK_API_KEY",
+  "base_url": "https://api.deepseek.com/v1",
+  "context_window": 131072,
+  "max_tokens": 8192,
+  "temperature": 0.7,
+  "capabilities": [
+    "complex_logic",
+    "algorithms"
+  ],
+  "internet_access": false,
+  "priority": 3
+}

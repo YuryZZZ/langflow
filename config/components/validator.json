@@ -1,0 +1,18 @@
+{
+  "display_name": "Validator - Gemini Flash",
+  "provider": "google",
+  "model": "gemini-3-flash-preview",
+  "api_key_env": "GOOGLE_API_KEY",
+  "base_url": "https://generativelanguage.googleapis.com/v1beta",
+  "context_window": 1000000,
+  "max_tokens": 64000,
+  "temperature": 0.4,
+  "capabilities": [
+    "validation",
+    "cross_check",
+    "fact_checking",
+    "search"
+  ],
+  "internet_access": true,
+  "priority": 2
+}

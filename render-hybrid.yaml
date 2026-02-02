@@ -1,0 +1,51 @@
+services:
+  # Hybrid Langflow + OpenCode service
+  - type: web
+    name: langflow-hybrid
+    runtime: docker
+    dockerfilePath: ./docker/hybrid.Dockerfile
+    repo: https://github.com/langflow-ai/langflow
+    branch: main
+    plan: standard
+    healthCheckPath: /health_check
+    autoDeploy: false
+    envVars:
+      - key: LANGFLOW_DATABASE_URL
+        value: sqlite:////app/data/.cache/langflow/langflow.db
+      - key: LANGFLOW_HOST
+        value: 0.0.0.0
+      - key: LANGFLOW_PORT
+        value: 10000
+      - key: LANGFLOW_LOG_LEVEL
+        value: INFO
+      - key: OPENCODE_DATA_DIR
+        value: /app/data/.cache/opencode
+      - key: OPENCODE_PROJECT_ID
+        value: langflow_hybrid_render
+      - key: OPENCODE_MCP_SERVERS_ENABLED
+        value: "true"
+    disk:
+      name: langflow-hybrid-data
+      mountPath: /app/data
+    domains:
+      - langflow-hybrid.onrender.com
+
+  # Optional: Separate OpenCode worker service for scaling
+  - type: worker
+    name: opencode-workers
+    runtime: docker
+    dockerfilePath: ./docker/hybrid.Dockerfile
+    repo: https://github.com/langflow-ai/langflow
+    branch: main
+    plan: standard
+    envVars:
+      - key: OPENCODE_WORKER_MODE
+        value: "true"
+      - key: OPENCODE_DATA_DIR
+        value: /app/data/.cache/opencode
+      - key: OPENCODE_PROJECT_ID
+        value: langflow_hybrid_render
+    disk:
+      name: langflow-hybrid-data
+      mountPath: /app/data
+    command: /app/scripts/start-workers.sh

@@ -1,0 +1,23 @@
+{
+  "display_name": "Researcher - Perplexity Sonar Pro",
+  "provider": "perplexity",
+  "model": "sonar-pro",
+  "api_key_env": "PERPLEXITY_API_KEY",
+  "base_url": "https://api.perplexity.ai",
+  "context_window": 128000,
+  "max_tokens": 64000,
+  "temperature": 0.7,
+  "capabilities": [
+    "web_search",
+    "citations",
+    "real_time",
+    "research"
+  ],
+  "internet_access": true,
+  "search_config": {
+    "mode": "sonar-pro",
+    "citations": true,
+    "recency_days": 30
+  },
+  "priority": 1
+}

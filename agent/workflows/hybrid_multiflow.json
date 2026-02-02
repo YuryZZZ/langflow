@@ -1,0 +1,93 @@
+{
+  "name": "Hybrid Multiflow Example",
+  "description": "Example workflow demonstrating Langflow + OpenCode hybrid execution",
+  "version": "1.0.0",
+  "created": "2026-01-28",
+  "components": [
+    {
+      "id": "hybrid_agent_1",
+      "type": "HybridAgent",
+      "config": {
+        "task_description": "Develop and deploy AI feature",
+        "subtasks": [
+          "Analyze user requirements and use cases",
+          "Design AI model architecture and data pipeline",
+          "Implement core AI functionality with error handling",
+          "Create comprehensive test suite with 90%+ coverage",
+          "Perform security and performance review",
+          "Deploy to staging environment for validation"
+        ],
+        "enable_validation": true,
+        "max_parallel_workers": 6
+      },
+      "position": { "x": 100, "y": 100 }
+    },
+    {
+      "id": "prompt_1",
+      "type": "Prompt",
+      "config": {
+        "text": "You are coordinating a hybrid multiflow execution. Monitor parallel agent progress and aggregate results."
+      },
+      "position": { "x": 100, "y": 300 }
+    },
+    {
+      "id": "memory_component",
+      "type": "MemoryComponent",
+      "config": {
+        "memory_key": "hybrid_execution_context",
+        "return_messages": true
+      },
+      "position": { "x": 400, "y": 100 }
+    },
+    {
+      "id": "output_aggregator",
+      "type": "CustomComponent",
+      "config": {
+        "name": "HybridResultsAggregator",
+        "description": "Aggregates results from parallel OpenCode execution"
+      },
+      "position": { "x": 400, "y": 300 }
+    }
+  ],
+  "edges": [
+    {
+      "source": "hybrid_agent_1",
+      "sourceHandle": "results",
+      "target": "output_aggregator",
+      "targetHandle": "input"
+    },
+    {
+      "source": "prompt_1",
+      "sourceHandle": "output",
+      "target": "hybrid_agent_1",
+      "targetHandle": "context_message"
+    },
+    {
+      "source": "memory_component",
+      "sourceHandle": "output",
+      "target": "hybrid_agent_1",
+      "targetHandle": "memory_input"
+    }
+  ],
+  "execution_config": {
+    "parallel_execution": true,
+    "max_concurrent_flows": 3,
+    "validation_required": true,
+    "fallback_strategy": "retry_with_different_agent",
+    "timeout_seconds": 3600
+  },
+  "agent_mapping": {
+    "simple_tasks": "coder-fast",
+    "complex_logic": "coder-deepseek",
+    "testing": "tester",
+    "review": "reviewer",
+    "validation": "validator",
+    "orchestration": "orchestrator"
+  },
+  "integration_points": {
+    "langflow_ui": "http://localhost:10000",
+    "opencode_taskbus": "http://localhost:8081",
+    "memory_server": "http://localhost:8082",
+    "hybrid_bridge": "/app/hybrid_bridge.py"
+  }
+}

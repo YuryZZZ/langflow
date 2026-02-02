@@ -1,0 +1,532 @@
+{
+  "name": "Hybrid 5-Level Multi-Agent System - Complete",
+  "description": "Full 5-layer hybrid architecture: Parallel Planning → Sequential Design → Parallel Implementation → Sequential Review → Parallel Validation",
+  "version": "9.5.1",
+  "created": "2026-02-02",
+  "architecture": "5-Level Hybrid (Parallel + Sequential)",
+  "layers": [
+    {
+      "level": 1,
+      "name": "Orchestration Layer",
+      "type": "control",
+      "mode": "sequential",
+      "description": "Master orchestrator controls entire flow"
+    },
+    {
+      "level": 2,
+      "name": "Parallel Planning Layer",
+      "type": "parallel",
+      "mode": "parallel",
+      "agents": 5,
+      "description": "5 planners work in parallel on different aspects"
+    },
+    {
+      "level": 3,
+      "name": "Sequential Design Layer",
+      "type": "sequential",
+      "mode": "sequential",
+      "agents": 4,
+      "description": "Architecture → Components → Interface → Data Model"
+    },
+    {
+      "level": 4,
+      "name": "Parallel Implementation Layer",
+      "type": "parallel",
+      "mode": "parallel",
+      "agents": 6,
+      "description": "6 coders implement in parallel"
+    },
+    {
+      "level": 5,
+      "name": "Sequential Review Layer",
+      "type": "sequential",
+      "mode": "sequential",
+      "agents": 4,
+      "description": "Code Review → Security → Testing → Documentation"
+    },
+    {
+      "level": 6,
+      "name": "Parallel Validation Layer",
+      "type": "parallel",
+      "mode": "parallel",
+      "agents": 2,
+      "description": "Cross-model validation by different providers"
+    }
+  ],
+  "components": [
+    {
+      "id": "orchestrator",
+      "layer": 1,
+      "type": "HybridAgent",
+      "name": "L1: Master Orchestrator",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Controls all 5 layers with PARL Agent Swarm",
+      "role": "orchestrator",
+      "capabilities": ["parl_decompose", "parl_spawn", "parl_aggregate"],
+      "position": { "x": 500, "y": 50 }
+    },
+
+    {
+      "id": "planner_1",
+      "layer": 2,
+      "type": "Agent",
+      "name": "L2-P1: Architecture Planner",
+      "model": "google/gemini-3-pro",
+      "description": "System architecture & data flow",
+      "role": "planner",
+      "specialty": "architecture",
+      "parallel_group": "planners",
+      "dependencies": ["orchestrator"],
+      "position": { "x": 100, "y": 200 }
+    },
+    {
+      "id": "planner_2",
+      "layer": 2,
+      "type": "Agent",
+      "name": "L2-P2: Security Planner",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Security architecture & threat modeling",
+      "role": "planner",
+      "specialty": "security",
+      "parallel_group": "planners",
+      "dependencies": ["orchestrator"],
+      "position": { "x": 250, "y": 200 }
+    },
+    {
+      "id": "planner_3",
+      "layer": 2,
+      "type": "Agent",
+      "name": "L2-P3: Workflow Planner",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Workflow design & process optimization",
+      "role": "planner",
+      "specialty": "workflow",
+      "parallel_group": "planners",
+      "dependencies": ["orchestrator"],
+      "position": { "x": 400, "y": 200 }
+    },
+    {
+      "id": "planner_4",
+      "layer": 2,
+      "type": "Agent",
+      "name": "L2-P4: Logic Planner",
+      "model": "deepseek/deepseek-chat",
+      "description": "Algorithm design & business logic",
+      "role": "planner",
+      "specialty": "logic",
+      "parallel_group": "planners",
+      "dependencies": ["orchestrator"],
+      "position": { "x": 550, "y": 200 }
+    },
+    {
+      "id": "planner_5",
+      "layer": 2,
+      "type": "Agent",
+      "name": "L2-P5: Implementation Planner",
+      "model": "zai/glm-4.7",
+      "description": "Implementation strategy & testing approach",
+      "role": "planner",
+      "specialty": "implementation",
+      "parallel_group": "planners",
+      "dependencies": ["orchestrator"],
+      "position": { "x": 700, "y": 200 }
+    },
+
+    {
+      "id": "designer_architecture",
+      "layer": 3,
+      "type": "Agent",
+      "name": "L3-S1: System Architect",
+      "model": "google/gemini-3-pro",
+      "description": "Detailed system architecture",
+      "role": "designer",
+      "specialty": "system_design",
+      "sequential_order": 1,
+      "dependencies": ["planner_1", "planner_2", "planner_3", "planner_4", "planner_5"],
+      "position": { "x": 150, "y": 350 }
+    },
+    {
+      "id": "designer_components",
+      "layer": 3,
+      "type": "Agent",
+      "name": "L3-S2: Component Designer",
+      "model": "zai/glm-4.7",
+      "description": "Component breakdown & interfaces",
+      "role": "designer",
+      "specialty": "component_design",
+      "sequential_order": 2,
+      "dependencies": ["designer_architecture"],
+      "position": { "x": 300, "y": 350 }
+    },
+    {
+      "id": "designer_interface",
+      "layer": 3,
+      "type": "Agent",
+      "name": "L3-S3: Interface Designer",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "API design & UX/UI specifications",
+      "role": "designer",
+      "specialty": "interface_design",
+      "sequential_order": 3,
+      "dependencies": ["designer_components"],
+      "position": { "x": 450, "y": 350 }
+    },
+    {
+      "id": "designer_data",
+      "layer": 3,
+      "type": "Agent",
+      "name": "L3-S4: Data Model Designer",
+      "model": "deepseek/deepseek-chat",
+      "description": "Database schema & data structures",
+      "role": "designer",
+      "specialty": "data_design",
+      "sequential_order": 4,
+      "dependencies": ["designer_interface"],
+      "position": { "x": 600, "y": 350 }
+    },
+
+    {
+      "id": "coder_backend",
+      "layer": 4,
+      "type": "Agent",
+      "name": "L4-P1: Backend Developer",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Backend API implementation",
+      "role": "coder",
+      "specialty": "backend",
+      "parallel_group": "coders",
+      "dependencies": ["designer_data"],
+      "position": { "x": 50, "y": 500 }
+    },
+    {
+      "id": "coder_frontend",
+      "layer": 4,
+      "type": "Agent",
+      "name": "L4-P2: Frontend Developer",
+      "model": "zai/glm-4.7",
+      "description": "Frontend UI implementation",
+      "role": "coder",
+      "specialty": "frontend",
+      "parallel_group": "coders",
+      "dependencies": ["designer_data"],
+      "position": { "x": 200, "y": 500 }
+    },
+    {
+      "id": "coder_database",
+      "layer": 4,
+      "type": "Agent",
+      "name": "L4-P3: Database Developer",
+      "model": "deepseek/deepseek-chat",
+      "description": "Database implementation & migrations",
+      "role": "coder",
+      "specialty": "database",
+      "parallel_group": "coders",
+      "dependencies": ["designer_data"],
+      "position": { "x": 350, "y": 500 }
+    },
+    {
+      "id": "coder_security",
+      "layer": 4,
+      "type": "Agent",
+      "name": "L4-P4: Security Developer",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Security implementation & auth",
+      "role": "coder",
+      "specialty": "security",
+      "parallel_group": "coders",
+      "dependencies": ["designer_data"],
+      "position": { "x": 500, "y": 500 }
+    },
+    {
+      "id": "coder_fast",
+      "layer": 4,
+      "type": "Agent",
+      "name": "L4-P5: Fast Coder",
+      "model": "google/gemini-3-flash",
+      "description": "Quick implementations & utilities",
+      "role": "coder",
+      "specialty": "fast_coding",
+      "parallel_group": "coders",
+      "dependencies": ["designer_data"],
+      "position": { "x": 650, "y": 500 }
+    },
+    {
+      "id": "coder_integration",
+      "layer": 4,
+      "type": "Agent",
+      "name": "L4-P6: Integration Developer",
+      "model": "zai/glm-4.7",
+      "description": "Integration & glue code",
+      "role": "coder",
+      "specialty": "integration",
+      "parallel_group": "coders",
+      "dependencies": ["designer_data"],
+      "position": { "x": 800, "y": 500 }
+    },
+
+    {
+      "id": "reviewer_code",
+      "layer": 5,
+      "type": "Agent",
+      "name": "L5-S1: Code Reviewer",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Code quality review",
+      "role": "reviewer",
+      "specialty": "code_review",
+      "sequential_order": 1,
+      "dependencies": ["coder_backend", "coder_frontend", "coder_database", "coder_security", "coder_fast", "coder_integration"],
+      "position": { "x": 200, "y": 650 }
+    },
+    {
+      "id": "reviewer_security",
+      "layer": 5,
+      "type": "Agent",
+      "name": "L5-S2: Security Reviewer",
+      "model": "anthropic/claude-sonnet-4-5",
+      "description": "Security audit & vulnerability scan",
+      "role": "reviewer",
+      "specialty": "security_review",
+      "sequential_order": 2,
+      "dependencies": ["reviewer_code"],
+      "position": { "x": 350, "y": 650 }
+    },
+    {
+      "id": "tester",
+      "layer": 5,
+      "type": "Agent",
+      "name": "L5-S3: Test Engineer",
+      "model": "zai/glm-4.7",
+      "description": "Test suite creation & execution",
+      "role": "tester",
+      "specialty": "testing",
+      "sequential_order": 3,
+      "dependencies": ["reviewer_security"],
+      "position": { "x": 500, "y": 650 }
+    },
+    {
+      "id": "documenter",
+      "layer": 5,
+      "type": "Agent",
+      "name": "L5-S4: Technical Writer",
+      "model": "moonshot/kimi-k2.5",
+      "description": "Documentation & README",
+      "role": "documenter",
+      "specialty": "documentation",
+      "sequential_order": 4,
+      "dependencies": ["tester"],
+      "position": { "x": 650, "y": 650 }
+    },
+
+    {
+      "id": "validator_google",
+      "layer": 6,
+      "type": "Agent",
+      "name": "L6-V1: Google Validator",
+      "model": "google/gemini-3-flash",
+      "description": "Validation via Google family",
+      "role": "validator",
+      "provider": "google",
+      "parallel_group": "validators",
+      "dependencies": ["documenter"],
+      "position": { "x": 400, "y": 800 }
+    },
+    {
+      "id": "validator_anthropic",
+      "layer": 6,
+      "type": "Agent",
+      "name": "L6-V2: Anthropic Validator",
+      "model": "anthropic/claude-haiku-4-5",
+      "description": "Validation via Anthropic family",
+      "role": "validator",
+      "provider": "anthropic",
+      "parallel_group": "validators",
+      "dependencies": ["documenter"],
+      "position": { "x": 600, "y": 800 }
+    },
+
+    {
+      "id": "researcher",
+      "layer": 0,
+      "type": "Agent",
+      "name": "Researcher - Perplexity",
+      "model": "perplexity/sonar-pro",
+      "description": "Internet research with citations",
+      "role": "researcher",
+      "internet_access": true,
+      "position": { "x": 900, "y": 200 }
+    },
+    {
+      "id": "analyst",
+      "layer": 0,
+      "type": "Agent",
+      "name": "Analyst - Gemini Pro",
+      "model": "google/gemini-3-pro",
+      "description": "Data analysis with grounding",
+      "role": "analyst",
+      "internet_access": true,
+      "position": { "x": 900, "y": 350 }
+    },
+
+    {
+      "id": "memory_hub",
+      "layer": 0,
+      "type": "MemoryComponent",
+      "name": "MCP Memory Hub",
+      "description": "Cross-layer memory with MCP",
+      "config": {
+        "memory_key": "hybrid_5level_memory",
+        "mcp_enabled": true,
+        "prevent_truncation": true
+      },
+      "position": { "x": 950, "y": 500 }
+    },
+    {
+      "id": "output_aggregator",
+      "layer": 0,
+      "type": "CustomComponent",
+      "name": "Final Aggregator",
+      "description": "Aggregates all layer outputs",
+      "config": {
+        "aggregation_strategy": "weighted_merge",
+        "include_raw": true,
+        "include_validated": true
+      },
+      "position": { "x": 500, "y": 950 }
+    }
+  ],
+
+  "edges": [
+    "=== LEVEL 1: ORCHESTRATION ===",
+    { "source": "orchestrator", "target": "planner_1", "type": "dispatches_to", "layer_transition": "1→2" },
+    { "source": "orchestrator", "target": "planner_2", "type": "dispatches_to", "layer_transition": "1→2" },
+    { "source": "orchestrator", "target": "planner_3", "type": "dispatches_to", "layer_transition": "1→2" },
+    { "source": "orchestrator", "target": "planner_4", "type": "dispatches_to", "layer_transition": "1→2" },
+    { "source": "orchestrator", "target": "planner_5", "type": "dispatches_to", "layer_transition": "1→2" },
+
+    "=== LEVEL 2: PARALLEL PLANNING → LEVEL 3: SEQUENTIAL DESIGN ===",
+    { "source": "planner_1", "target": "designer_architecture", "type": "provides_architecture_context" },
+    { "source": "planner_2", "target": "designer_architecture", "type": "provides_security_requirements" },
+    { "source": "planner_3", "target": "designer_architecture", "type": "provides_workflow_requirements" },
+    { "source": "planner_4", "target": "designer_architecture", "type": "provides_logic_requirements" },
+    { "source": "planner_5", "target": "designer_architecture", "type": "provides_implementation_context" },
+
+    { "source": "designer_architecture", "target": "designer_components", "type": "feeds_to", "layer_transition": "2→3" },
+    { "source": "designer_components", "target": "designer_interface", "type": "feeds_to", "layer_transition": "3→3" },
+    { "source": "designer_interface", "target": "designer_data", "type": "feeds_to", "layer_transition": "3→3" },
+
+    "=== LEVEL 3: SEQUENTIAL DESIGN → LEVEL 4: PARALLEL IMPLEMENTATION ===",
+    { "source": "designer_data", "target": "coder_backend", "type": "provides_specification", "layer_transition": "3→4" },
+    { "source": "designer_data", "target": "coder_frontend", "type": "provides_specification", "layer_transition": "3→4" },
+    { "source": "designer_data", "target": "coder_database", "type": "provides_specification", "layer_transition": "3→4" },
+    { "source": "designer_data", "target": "coder_security", "type": "provides_specification", "layer_transition": "3→4" },
+    { "source": "designer_data", "target": "coder_fast", "type": "provides_specification", "layer_transition": "3→4" },
+    { "source": "designer_data", "target": "coder_integration", "type": "provides_specification", "layer_transition": "3→4" },
+
+    "=== LEVEL 4: PARALLEL IMPLEMENTATION → LEVEL 5: SEQUENTIAL REVIEW ===",
+    { "source": "coder_backend", "target": "reviewer_code", "type": "submits_for_review", "layer_transition": "4→5" },
+    { "source": "coder_frontend", "target": "reviewer_code", "type": "submits_for_review", "layer_transition": "4→5" },
+    { "source": "coder_database", "target": "reviewer_code", "type": "submits_for_review", "layer_transition": "4→5" },
+    { "source": "coder_security", "target": "reviewer_code", "type": "submits_for_review", "layer_transition": "4→5" },
+    { "source": "coder_fast", "target": "reviewer_code", "type": "submits_for_review", "layer_transition": "4→5" },
+    { "source": "coder_integration", "target": "reviewer_code", "type": "submits_for_review", "layer_transition": "4→5" },
+
+    { "source": "reviewer_code", "target": "reviewer_security", "type": "feeds_to", "layer_transition": "5→5" },
+    { "source": "reviewer_security", "target": "tester", "type": "feeds_to", "layer_transition": "5→5" },
+    { "source": "tester", "target": "documenter", "type": "feeds_to", "layer_transition": "5→5" },
+
+    "=== LEVEL 5: SEQUENTIAL REVIEW → LEVEL 6: PARALLEL VALIDATION ===",
+    { "source": "documenter", "target": "validator_google", "type": "submits_for_validation", "layer_transition": "5→6" },
+    { "source": "documenter", "target": "validator_anthropic", "type": "submits_for_validation", "layer_transition": "5→6" },
+
+    "=== RESEARCH SUPPORT (Parallel to all layers) ===",
+    { "source": "orchestrator", "target": "researcher", "type": "requests_research" },
+    { "source": "planner_1", "target": "researcher", "type": "requests_current_best_practices" },
+    { "source": "designer_architecture", "target": "researcher", "type": "requests_architecture_patterns" },
+    { "source": "analyst", "target": "planner_1", "type": "provides_analysis", "bidirectional": true },
+    { "source": "analyst", "target": "designer_data", "type": "provides_data_insights", "bidirectional": true },
+
+    "=== MEMORY HUB (All agents write to memory) ===",
+    { "source": "planner_1", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "planner_2", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "planner_3", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "planner_4", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "planner_5", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "designer_architecture", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "designer_components", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "designer_interface", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "designer_data", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "coder_backend", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "coder_frontend", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "coder_database", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "coder_security", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "coder_fast", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "coder_integration", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "reviewer_code", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "reviewer_security", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "tester", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "documenter", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "validator_google", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "validator_anthropic", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "researcher", "target": "memory_hub", "type": "writes_to_memory" },
+    { "source": "analyst", "target": "memory_hub", "type": "writes_to_memory" },
+
+    "=== AGGREGATION ===",
+    { "source": "validator_google", "target": "output_aggregator", "type": "provides_validated_output" },
+    { "source": "validator_anthropic", "target": "output_aggregator", "type": "provides_validated_output" },
+    { "source": "memory_hub", "target": "output_aggregator", "type": "provides_all_outputs" },
+    { "source": "output_aggregator", "target": "orchestrator", "type": "reports_completion" }
+  ],
+
+  "execution_config": {
+    "mode": "hybrid_5level",
+    "parallel_groups": ["planners", "coders", "validators"],
+    "sequential_chains": [
+      ["designer_architecture", "designer_components", "designer_interface", "designer_data"],
+      ["reviewer_code", "reviewer_security", "tester", "documenter"]
+    ],
+    "max_parallel_per_group": 6,
+    "sequential_timeout": 1800,
+    "parallel_timeout": 900,
+    "cross_validation": true,
+    "mcp_memory_sync": true,
+    "layer_progress_tracking": true
+  },
+
+  "layer_execution": {
+    "layer_1_orchestration": {
+      "mode": "sequential",
+      "agents": ["orchestrator"],
+      "output": "Task decomposition & coordination"
+    },
+    "layer_2_planning": {
+      "mode": "parallel",
+      "agents": ["planner_1", "planner_2", "planner_3", "planner_4", "planner_5"],
+      "concurrent": true,
+      "output": "5 parallel plans (architecture, security, workflow, logic, implementation)"
+    },
+    "layer_3_design": {
+      "mode": "sequential",
+      "agents": ["designer_architecture", "designer_components", "designer_interface", "designer_data"],
+      "chain": true,
+      "output": "Complete design specifications"
+    },
+    "layer_4_implementation": {
+      "mode": "parallel",
+      "agents": ["coder_backend", "coder_frontend", "coder_database", "coder_security", "coder_fast", "coder_integration"],
+      "concurrent": true,
+      "output": "6 parallel code implementations"
+    },
+    "layer_5_review": {
+      "mode": "sequential",
+      "agents": ["reviewer_code", "reviewer_security", "tester", "documenter"],
+      "chain": true,
+      "output": "Reviewed, tested, documented code"
+    },
+    "layer_6_validation": {
+      "mode": "parallel",
+      "agents": ["validator_google", "validator_anthropic"],
+      "concurrent": true,
+      "output": "Cross-model validated results"
+    }
+  }
+}

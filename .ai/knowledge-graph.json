@@ -1,0 +1,62 @@
+{
+  "entities": [
+    {
+      "name": "_validate",
+      "entityType": "test",
+      "observations": [
+        "ok"
+      ]
+    },
+    {
+      "name": "doctor_run_2026-02-02T15:26:51Z",
+      "entityType": "validation",
+      "observations": [
+        "passed=false",
+        "failed_count=1",
+        "report=.ai/artifacts/validation/doctor_latest.json"
+      ]
+    },
+    {
+      "name": "hybrid_multiflow_system",
+      "entityType": "system_architecture",
+      "observations": [
+        "Langflow visual workflow engine + OpenCode parallel execution",
+        "Hybrid Agent Component bridges both systems",
+        "5-layer hybrid workflow with parallel/sequential execution",
+        "Memory system for cross-layer communication"
+      ]
+    },
+    {
+      "name": "integration_points_analysis",
+      "entityType": "analysis_report",
+      "observations": [
+        "Identified 7 key integration points",
+        "Hybrid system bridges Langflow UI with OpenCode parallel execution",
+        "Memory system enables cross-layer communication",
+        "Deployment ready with Render configuration"
+      ]
+    },
+    {
+      "name": "doctor_run_2026-02-02T15:47:20Z",
+      "entityType": "validation",
+      "observations": [
+        "passed=false",
+        "failed_count=1",
+        "report=.ai/artifacts/validation/doctor_latest.json"
+      ]
+    },
+    {
+      "name": "langflow_render_connection_2026-02-02",
+      "entityType": "deployment_review",
+      "observations": [
+        "Connected to Render instance: https://langflow-7vd3.onrender.com",
+        "31 flows in Hybrid Multi-Model Orchestration project",
+        "12 specialized agents (M1-M12) + Master Orchestrator configured",
+        "Multi-provider architecture: OpenAI, Gemini, DeepSeek, GLM-4.7, Sonar Pro, Kimi",
+        "Screenshot captured: langflow_master_orchestrator.png",
+        "Run ID: run_de1f3b4d"
+      ]
+    }
+  ],
+  "relations": []
+}

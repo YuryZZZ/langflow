@@ -1,0 +1,13 @@
+{
+  "content": "ProviderModelNotFoundError: ProviderModelNotFoundError\n data: {\n  providerID: \"anthropic\",\n  modelID: \"claude-sonnet-4-5-20250514\",\n  suggestions: [],\n},\n\n      at getModel (src/provider/provider.ts:1078:17)\n      at processTicksAndRejections (unknown:7:39)\n\n",
+  "metadata": {
+    "task_id": "task_4238e118",
+    "executor": "planner-2",
+    "worker_id": "worker-5",
+    "mode": "opencode",
+    "exit_code": 0,
+    "ts": "2026-02-02T15:32:07.330715Z",
+    "stream": "stderr"
+  },
+  "hash": "37581ce1816bb816"
+}

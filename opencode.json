@@ -1,0 +1,1104 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "moonshot/kimi-k2.5",
+  "tui": {
+    "sidebar": "show",
+    "scroll_speed": 3,
+    "scroll_acceleration": {
+      "enabled": true
+    },
+    "diff_style": "auto"
+  },
+  "instructions": [
+    "SYSTEM.md",
+    "MODELS.md",
+    ".ai/PROJECT_KNOWLEDGE.md"
+  ],
+  "provider": {
+    "google": {
+      "npm": "@ai-sdk/google",
+      "name": "Google",
+      "options": {
+        "useVertex": true,
+        "project": "legalai-480809",
+        "location": "global",
+        "auth": "gcloud"
+      },
+      "models": {
+        "gemini-3-flash-preview": {
+          "name": "Gemini 3 Flash",
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        },
+        "gemini-3-pro-preview": {
+          "name": "Gemini 3 Pro",
+          "limit": {
+            "context": 1000000,
+            "output": 64000
+          }
+        }
+      }
+    },
+    "moonshot": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Moonshot (Kimi K2.5)",
+      "options": {
+        "baseURL": "https://api.moonshot.ai/v1",
+        "apiKey": "sk-nHqRs9j337z0EZiHGMEXVwB1yVZ4t02kNuSMNETAMySsrxUw"
+      },
+      "models": {
+        "moonshot-v1-8k": {
+          "name": "Kimi K2.5 8K",
+          "limit": {
+            "context": 8192,
+            "output": 4096
+          }
+        },
+        "moonshot-v1-32k": {
+          "name": "Kimi K2.5 32K",
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          }
+        },
+        "kimi-k2.5": {
+          "name": "Kimi K2.5 (1T MoE)",
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
+        },
+        "kimi-k2-thinking": {
+          "name": "Kimi K2 Thinking",
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
+        },
+        "moonshot-v1-128k": {
+          "name": "Moonshot 128K",
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          }
+        }
+      }
+    }
+  },
+  "agent": {
+    "orchestrator": {
+      "model": "moonshot/kimi-k2.5",
+      "description": "ORCHESTRATOR - Kimi K2.5 (1T MoE, 256K context). Full capabilities: code, search, read, write, execute. Can dispatch via taskbus/parallel or work directly.",
+      "systemPrompt": "DATABASE PERSISTENCE RULES (MANDATORY):\n1. ALWAYS call taskbus.update_task_progress() to persist progress (avoid truncation)\n2. Store important context in memory.aim_memory_store() for long-term persistence\n3. Use sequential-thinking.sequentialthinking() for complex reasoning chains\n4. NEVER rely on conversation context alone - write to DB constantly\n5. After each significant action, update progress_pct and status_notes in taskbus",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "google/gemini-3-pro-preview"
+      ],
+      "retry": {
+        "maxAttempts": 2,
+        "initialDelayMs": 1000,
+        "maxDelayMs": 5000,
+        "backoffMultiplier": 1.5,
+        "retryOn": ["rate_limit", "overloaded", "timeout", "5xx"],
+        "failFast": true
+      },
+      "timeout": 30000,
+      "mode": "primary",
+      "temperature": 0.3,
+      "maxSteps": 200,
+      "maxTokens": 32768,
+      "autoCompact": true,
+      "compactThreshold": 0.75,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "edit": true,
+        "write": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "edit": "allow",
+        "write": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-1": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "PLANNER-1 - Architecture & Data Strategy. Gemini 3 Pro with 1M context for comprehensive project analysis.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "anthropic/claude-sonnet-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-2": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "PLANNER-2 - Security & Validation. Claude Sonnet 4.5 for quality assurance and security architecture.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "google/gemini-3-pro-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-3": {
+      "model": "moonshot/moonshot-v1-32k",
+      "description": "PLANNER-3 - Workflow & Creative. Kimi K2.5 for creative workflow planning and innovative solutions.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "retry": {
+        "maxAttempts": 2,
+        "initialDelayMs": 1000,
+        "maxDelayMs": 5000,
+        "backoffMultiplier": 1.5,
+        "retryOn": ["rate_limit", "overloaded", "timeout", "5xx"],
+        "failFast": true
+      },
+      "timeout": 30000,
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-4": {
+      "model": "deepseek/deepseek-chat",
+      "description": "PLANNER-4 - Logic & Algorithms. DeepSeek V3 Chat for algorithmic planning.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "google/gemini-3-pro-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-5": {
+      "model": "zai/glm-4.7",
+      "description": "PLANNER-5 - Implementation & Testing. GLM-4.7 with 200K context for implementation planning and testing strategy.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.5,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-6": {
+      "model": "openai/gpt-5.2",
+      "description": "PLANNER-6 - Deep Reasoning. GPT-5.2 (400K context, 128K output) for complex architectural reasoning and critical decisions.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "anthropic/claude-sonnet-4-5",
+        "google/gemini-3-pro-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 128000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow"
+      }
+    },
+    "planner-7": {
+      "model": "perplexity/sonar-pro",
+      "description": "PLANNER-7 - Research & Discovery. Perplexity Sonar Pro for real-time research, documentation lookup, and API discovery.",
+      "systemPrompt": "DB PERSISTENCE (MANDATORY): Call taskbus.update_task_progress() constantly. Store findings in memory.aim_memory_store(). Use sequential-thinking for complex reasoning. NEVER truncate - write everything to DB.",
+      "fallbacks": [
+        "google/gemini-3-pro-preview",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.6,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "task": true,
+        "todowrite": true,
+        "todoread": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true,
+        "websearch": true,
+        "webfetch": true
+      },
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "mcp": "allow",
+        "websearch": "allow"
+      }
+    },
+    "coder": {
+      "model": "moonshot/kimi-k2.5",
+      "description": "CODER - Lead Developer. Kimi K2.5 (1T MoE) with 256K context, native vision, Agent Swarm capability.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "retry": {
+        "maxAttempts": 2,
+        "initialDelayMs": 1000,
+        "maxDelayMs": 5000,
+        "backoffMultiplier": 1.5,
+        "retryOn": ["rate_limit", "overloaded", "timeout", "5xx"],
+        "failFast": true
+      },
+      "timeout": 30000,
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 32768,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-fast": {
+      "model": "google/gemini-3-flash-preview",
+      "description": "CODER-FAST - Sub-2s response. Gemini 3 Flash with 1M context for rapid edits.",
+      "fallbacks": [
+        "groq/llama-3.3-70b-versatile",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 50,
+      "maxTokens": 65536,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-kimi": {
+      "model": "moonshot/moonshot-v1-32k",
+      "description": "CODER-KIMI - Creative coding. Kimi K2.5 for innovative implementations and UI/UX work.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "retry": {
+        "maxAttempts": 2,
+        "initialDelayMs": 1000,
+        "maxDelayMs": 5000,
+        "backoffMultiplier": 1.5,
+        "retryOn": ["rate_limit", "overloaded", "timeout", "5xx"],
+        "failFast": true
+      },
+      "timeout": 30000,
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-deepseek": {
+      "model": "deepseek/deepseek-chat",
+      "description": "CODER-DEEPSEEK - Complex logic. DeepSeek V3 for algorithms and debugging.",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "moonshot/moonshot-v1-32k"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 8192,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-groq": {
+      "model": "groq/llama-3.3-70b-versatile",
+      "description": "CODER-GROQ - Ultra-fast. Llama 3.3 70B on Groq for bulk/parallel tasks.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 50,
+      "maxTokens": 32768,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "build": {
+      "model": "openai/gpt-5.2",
+      "description": "BUILD (OpenAI) - Autonomous builds. GPT-5.2 with 400K context for autonomous build systems.",
+      "fallbacks": [
+        "moonshot/kimi-k2.5",
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 200,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "tester": {
+      "model": "zai/glm-4.7",
+      "description": "TESTER (Z.AI) - Test generation. GLM-4.7 for comprehensive test generation.",
+      "fallbacks": [
+        "anthropic/claude-sonnet-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "reviewer": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "REVIEWER - Quality Assurance. Claude Sonnet 4.5 for quality code review.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 30,
+      "maxTokens": 32000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "validator": {
+      "model": "google/gemini-3-flash-preview",
+      "description": "VALIDATOR (Google) - Cross-validation. Gemini 3 Flash for fast cross-model validation.",
+      "fallbacks": [
+        "anthropic/claude-haiku-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 30,
+      "maxTokens": 65536,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "validator-anthropic": {
+      "model": "anthropic/claude-haiku-4-5-20250514",
+      "description": "VALIDATOR (Anthropic) - Backup validation. Claude Haiku 4.5 for cost-effective validation.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 30,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "security": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "SECURITY (Anthropic) - OWASP analysis. Claude Sonnet 4.5 for security and quality assurance.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "debugger": {
+      "model": "zai/glm-4.7",
+      "description": "DEBUGGER (Z.AI) - Root cause analysis. GLM-4.7 for deep debugging and analysis.",
+      "fallbacks": [
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "bash": true,
+        "glob": true,
+        "grep": true,
+        "edit": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "analyst": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "ANALYST (Google) - Architecture review. Gemini 3 Flash for fast analysis.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "researcher": {
+      "model": "zai/glm-4.7",
+      "description": "RESEARCHER (Z.AI) - Deep web research. GLM-4.7 for comprehensive research.",
+      "fallbacks": [
+        "perplexity/sonar-pro"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 30,
+      "maxTokens": 32000,
+      "tools": {
+        "read": true,
+        "webfetch": true,
+        "mcp": true
+      }
+    },
+    "search": {
+      "model": "perplexity/sonar-pro",
+      "description": "SEARCH (Perplexity) - Fact-checking. Sonar Pro for web search with citations.",
+      "fallbacks": [
+        "tavily/tavily_search"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 20,
+      "maxTokens": 8000,
+      "tools": {
+        "read": true,
+        "webfetch": true,
+        "mcp": true
+      }
+    },
+    "deepseek-think": {
+      "model": "deepseek/deepseek-chat",
+      "description": "THINKER (DeepSeek) - Chain-of-thought. DeepSeek Reasoner for CoT reasoning.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 64000,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "edit": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "kimi": {
+      "model": "moonshot/kimi-k2.5",
+      "description": "KIMI K2.5 - Primary Orchestrator (1T MoE, 256K context, Native Agent Swarm)",
+      "fallbacks": [
+        "zai/glm-4.7",
+        "deepseek/deepseek-chat",
+        "google/gemini-3-flash-preview"
+      ],
+      "retry": {
+        "maxAttempts": 2,
+        "initialDelayMs": 1000,
+        "maxDelayMs": 5000,
+        "backoffMultiplier": 1.5,
+        "retryOn": ["rate_limit", "overloaded", "timeout", "5xx"],
+        "failFast": true
+      },
+      "timeout": 30000,
+      "mode": "primary",
+      "temperature": 1.0,
+      "maxSteps": 100,
+      "maxTokens": 32000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "reasoner": {
+      "model": "groq/openai/gpt-oss-120b",
+      "description": "REASONER - GPT-OSS 120B. Fast reasoning on Groq.",
+      "fallbacks": [
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 1.0,
+      "maxSteps": 50,
+      "maxTokens": 8192,
+      "tools": {
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "mcp": true
+      }
+    },
+    "mass-worker": {
+      "model": "groq/llama-3.3-70b-versatile",
+      "description": "MASS WORKER - Llama 3.3 70B. Bulk processing on Groq.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 32768,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "cheap-worker": {
+      "model": "groq/llama-3.1-8b-instant",
+      "description": "CHEAP WORKER - Llama 3.1 8B. TRIVIAL TASKS ONLY on Groq.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 20,
+      "maxTokens": 8000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "claude-haiku": {
+      "model": "anthropic/claude-haiku-4-5-20250514",
+      "description": "ESCALATION A - Claude Haiku 4.5. Cost-effective quality.",
+      "fallbacks": [
+        "google/gemini-3-flash-preview"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 30,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "mcp": true
+      }
+    },
+    "claude-sonnet": {
+      "model": "anthropic/claude-sonnet-4-5-20250514",
+      "description": "ESCALATION TIER A - Claude Sonnet 4.5. High quality code and reasoning.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "claude-opus": {
+      "model": "anthropic/claude-opus-4-5-20250514",
+      "description": "ESCALATION TIER S - Claude Opus 4.5. CRITICAL ONLY.",
+      "fallbacks": [
+        "openai/gpt-5.2"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gpt-5.2": {
+      "model": "openai/gpt-5.2",
+      "description": "ESCALATION - GPT-5.2 Thinking. Critical reasoning.",
+      "fallbacks": [
+        "anthropic/claude-opus-4-5-20250514"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 128000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "coder-glm": {
+      "model": "zai/glm-4.7",
+      "description": "CODER-GLM - Z.AI GLM-4.7 with 200K context for stable multi-step coding.",
+      "fallbacks": [
+        "moonshot/kimi-k2.5",
+        "deepseek/deepseek-chat"
+      ],
+      "mode": "primary",
+      "temperature": 0.7,
+      "maxSteps": 100,
+      "maxTokens": 128000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "task": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gemini-pro": {
+      "model": "google/gemini-3-pro-preview",
+      "description": "ESCALATION - Gemini 3 Pro. 1M context for large analysis.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 100,
+      "maxTokens": 64000,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "webfetch": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    },
+    "gemini-flash": {
+      "model": "google/gemini-3-flash-preview",
+      "description": "ESCALATION - Gemini 3 Flash. Fast execution.",
+      "fallbacks": [
+        "zai/glm-4.7"
+      ],
+      "mode": "primary",
+      "temperature": 0.8,
+      "maxSteps": 50,
+      "maxTokens": 65536,
+      "tools": {
+        "edit": true,
+        "write": true,
+        "read": true,
+        "bash": true,
+        "mcp": true,
+        "todowrite": true
+      }
+    }
+  },
+  "command": {
+    "auto": {
+      "template": "$ARGUMENTS\n\n10X PARALLEL MODE v9.5:\n\nSTEP 1 - CREATE RUN:\n  taskbus.create_run()\n\nSTEP 2 - DISPATCH (3 planners + 7 workers = 10 agents):\n  parallel.parallel_dispatch_planners(task_description='$ARGUMENTS')\n  parallel.parallel_dispatch_workers(planner='orchestrator', task_description='$ARGUMENTS')\n\nSTEP 3 - PARALLEL EXECUTION:\n  - 3 PLANNERS: planner-1(Gemini), planner-2(Kimi), planner-3(GLM)\n  - 7 WORKERS: coder, coder-fast, coder-glm, coder-deep, validator, reviewer, tester\n  - YOU (orchestrator): Coordinate and work directly\n\nSTEP 4 - CROSS-VALIDATION:\n  - Results validated by different provider\n  - Best solution merged\n\nRULES:\n  - 10 parallel agents for 10x speed\n  - Write progress to taskbus and memory MCP\n  - Auto-cleanup on exit (no orphan processes)",
+      "description": "10x parallel mode - 10 agents for maximum speed",
+      "agent": "orchestrator"
+    },
+    "fast": {
+      "template": "$ARGUMENTS\n\nFAST PARALLEL MODE:\n1. parallel.parallel_dispatch_workers() - dispatch 5 coders immediately\n2. Work directly while coders execute\n3. Cross-validate with different provider\n4. Merge best results",
+      "description": "Fast execution - skip planner using PostgreSQL TaskBus",
+      "agent": "orchestrator"
+    },
+    "debug": {
+      "template": "$ARGUMENTS\n\nDEBUG MODE:\n1. Call sequential-thinking.sequentialthinking() for chain-of-thought\n2. Dispatch to @debugger (Z.AI GLM-4.7)\n3. Deep root cause analysis\n4. Return findings and fix recommendations",
+      "description": "Deep debugging with chain-of-thought",
+      "agent": "debugger"
+    },
+    "route": {
+      "template": "$ARGUMENTS\n\nROUTING ANALYSIS:\n1. Analyze task complexity (1-10 scale)\n2. Check taskbus.get_recommended_coder(complexity)\n3. Return recommended: coder, validator, escalation path",
+      "description": "Get complexity score and optimal routing",
+      "agent": "orchestrator"
+    },
+    "plan": {
+      "template": "$ARGUMENTS\n\nPLAN ONLY (no execution):\n1. taskbus.create_run()\n2. parallel.parallel_dispatch_planners() - planners auto-execute\n3. taskbus.get_run_status() - check progress\n4. Synthesize proposals into master plan\n5. Return plan for user approval",
+      "description": "Create parallel architectural plan without executing",
+      "agent": "orchestrator"
+    },
+    "swarm": {
+      "template": "$ARGUMENTS\n\nPARALLEL SWARM MODE - 10 AGENTS:\n\n1. DISPATCH:\n   taskbus.create_run()\n   parallel.parallel_dispatch_planners('$ARGUMENTS')  // 3 planners\n   parallel.parallel_dispatch_workers('orchestrator', '$ARGUMENTS')  // 7 workers\n\n2. AGENTS:\n   PLANNERS (3): Gemini Pro, Kimi K2.5, GLM-4.7\n   WORKERS (7): coder, coder-fast, coder-glm, coder-deep, validator, reviewer, tester\n   ORCHESTRATOR: You - coordinate\n\n3. CROSS-VALIDATION:\n   - Results checked by different provider\n   - Best code merged\n\nTARGET: 10x speed with auto-cleanup on exit",
+      "description": "Parallel swarm - 10 agents for 10x speed",
+      "agent": "orchestrator"
+    },
+    "stop": {
+      "template": "SHUTDOWN SEQUENCE:\n1. Call context-compactor.context_compact_now() to save conversation\n2. Notify user: 'Context saved. Run stop.bat in terminal to terminate all processes.'\n3. DO NOT execute any more tasks after this command.",
+      "description": "Save context and prepare for shutdown (any active agent)"
+    },
+    "compact": {
+      "template": "COMPACT CONTEXT NOW:\n1. Call context-compactor.context_compact_now() to compress conversation history\n2. Call context-compactor.context_get_stats() to show new utilization\n3. Report: 'Context compacted. New utilization: X%'",
+      "description": "Force context compaction to free space",
+      "agent": "orchestrator"
+    }
+  },
+  "tools": {
+    "edit": true,
+    "bash": true,
+    "glob": true,
+    "grep": true,
+    "read": true,
+    "write": true,
+    "webfetch": true,
+    "task": true,
+    "todowrite": true,
+    "todoread": true
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "task": "allow",
+    "read": "allow",
+    "write": "allow",
+    "glob": "allow",
+    "grep": "allow"
+  },
+  "mcp": {
+    "taskbus": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/postgres_mcp.py"
+      ],
+      "environment": {
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_DB": "opencode_taskbus",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "postgres"
+      },
+      "enabled": true,
+      "timeout": 600000
+    },
+    "parallel": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/parallel_mcp.py"
+      ],
+      "enabled": true,
+      "timeout": 600000
+    },
+    "memory": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/memory_mcp.py",
+        "--memory-file-path",
+        ".ai/knowledge-graph.json"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/sequential_thinking_persistent.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "filesystem": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js",
+        "."
+      ],
+      "enabled": true
+    },
+    "github": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\github-mcp\\dist\\index.js"
+      ],
+      "enabled": true
+    },
+    "fetch": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\mcp-fetch-server\\dist\\index.js"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "codebase-map": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\mcp-codebase-map\\dist\\index.js",
+        ".",
+        "--db-path",
+        ".ai/codebase-map.db"
+      ],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "postgres": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-postgres\\dist\\index.js",
+        "postgresql://postgres:postgres@localhost:5432/opencode_taskbus"
+      ],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "playwright": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\@playwright\\mcp\\cli.js",
+        "--headless"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "computer-control": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\yuryz\\AppData\\Roaming\\npm\\node_modules\\computer-use-mcp\\dist\\main.js"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "tavily": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/tavily_mcp.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "perplexity": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/perplexity_mcp.py"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "apify": {
+      "type": "local",
+      "command": [
+        "C:\\Program Files\\nodejs\\npx.cmd",
+        "-y",
+        "@apify/actors-mcp-server"
+      ],
+      "enabled": false,
+      "timeout": 60000
+    },
+    "context-compactor": {
+      "type": "local",
+      "command": [
+        "python",
+        "-u",
+        "C:/Users/yuryz/.config/opencode/context_compactor.py"
+      ],
+      "enabled": true,
+      "timeout": 30000
+    }
+  }
+}
