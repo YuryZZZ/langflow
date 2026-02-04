@@ -1,0 +1,488 @@
+{
+  "name": "🚀 ULTIMATE MEGA FLOW - Multi-Agent Multi-Tool Parallel Sequential MCP",
+  "description": "Ultimate flow combining 10+ agents, 15 MCP tools, parallel processing, sequential validation, review loops, and real-time execution. The most comprehensive Langflow system ever created.",
+  "version": "10.0.0",
+  "endpoint_name": "ultimate_mega_system",
+  "icon": "Rocket",
+  "gradient": "rainbow",
+  "data": {
+    "nodes": [
+      {
+        "id": "UserInput",
+        "type": "ChatInput",
+        "position": { "x": 500, "y": 0 },
+        "data": {
+          "node": {
+            "display_name": "🎯 COMPLEX TASK INPUT",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "Enter complex task requiring research, analysis, and execution...",
+                "display_name": "Task Description"
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "TaskClassifier",
+        "type": "Agent",
+        "position": { "x": 500, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "🏷️ TASK CLASSIFIER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Task Classification Specialist. Analyze the user request and classify it into categories to determine the optimal processing strategy.\n\nClassification Dimensions:\n1. Complexity: Simple | Medium | Complex | Ultra-Complex\n2. Domain: Technical | Business | Research | Creative | Mixed\n3. Tools Required: Internet Research | Code | Analysis | Design | Multi\n4. Processing Mode: Sequential | Parallel | Hybrid\n5. Priority: Low | Medium | High | Critical\n\nOutput JSON:\n{\n  \"complexity\": \"complex\",\n  \"domain\": \"research\",\n  \"tools\": [\"tavily\", \"perplexity\", \"sequential-thinking\"],\n  \"mode\": \"hybrid\",\n  \"priority\": \"high\",\n  \"agents_needed\": 5,\n  \"estimated_time\": \"5-10 minutes\"\n}"
+              },
+              "model": { "type": "str", "value": "gpt-4o-mini" }
+            }
+          }
+        }
+      },
+      {
+        "id": "Orchestrator",
+        "type": "Agent",
+        "position": { "x": 500, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "👑 MASTER ORCHESTRATOR",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are the MASTER ORCHESTRATOR for the Ultimate Mega Flow system.\n\nYour Responsibilities:\n1. Parse task classification from TaskClassifier\n2. Determine parallel vs sequential execution\n3. Dispatch appropriate agents based on task needs\n4. Coordinate MCP tool usage\n5. Manage review loops and quality gates\n6. Synthesize final outputs\n\nExecution Strategy:\n- Research tasks: Dispatch 3 agents in PARALLEL (Tavily, Perplexity, Sequential)\n- Analysis tasks: Sequential chain with review loops\n- Code tasks: Parallel implementation + sequential review\n- Mixed tasks: Hybrid approach\n\nQuality Gates:\n- Every agent output → Reviewer → [APPROVED | REVISE]\n- Max 3 revision cycles per agent\n- Log all quality metrics to Memory MCP\n\nTools Available:\n- 15 MCP servers: tavily, perplexity, memory, taskbus, sequential-thinking, filesystem, github, fetch, codebase-map, postgres, playwright, computer-control, context-compactor, parallel, sequential-thinking\n\nCoordinate intelligently. Optimize for speed AND quality."
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.3 }
+            }
+          }
+        }
+      },
+      {
+        "id": "ParallelDispatcher",
+        "type": "MCPTool",
+        "position": { "x": 200, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "⚡ PARALLEL DISPATCHER",
+            "template": {
+              "mcp_server": { "type": "str", "value": "parallel" },
+              "tool_name": { "type": "str", "value": "dispatch" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "mode": "parallel",
+                  "agents": ["tavily-researcher", "perplexity-researcher", "deep-analyzer"],
+                  "task": "{task_description}",
+                  "timeout": 120
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "TavilyResearcher",
+        "type": "MCPTool",
+        "position": { "x": 100, "y": 450 },
+        "data": {
+          "node": {
+            "display_name": "🔍 TAVILY RESEARCHER",
+            "template": {
+              "mcp_server": { "type": "str", "value": "tavily" },
+              "tool_name": { "type": "str", "value": "search" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "query": "{research_query}",
+                  "max_results": 15,
+                  "search_depth": "comprehensive",
+                  "include_answer": true,
+                  "include_raw_content": true
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "PerplexityResearcher",
+        "type": "MCPTool",
+        "position": { "x": 250, "y": 450 },
+        "data": {
+          "node": {
+            "display_name": "🧠 PERPLEXITY RESEARCHER",
+            "template": {
+              "mcp_server": { "type": "str", "value": "perplexity" },
+              "tool_name": { "type": "str", "value": "search" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "query": "{research_query}",
+                  "model": "sonar-pro",
+                  "return_citations": true,
+                  "recency_filter": "month",
+                  "search_context": "high"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "DeepAnalyzer",
+        "type": "Agent",
+        "position": { "x": 400, "y": 450 },
+        "data": {
+          "node": {
+            "display_name": "🔬 DEEP ANALYZER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Deep Analysis Expert. Analyze research findings and extract key insights.\n\nTasks:\n1. Cross-reference Tavily and Perplexity results\n2. Identify patterns and trends\n3. Extract quantitative data points\n4. Validate consistency across sources\n5. Flag conflicting information\n6. Generate preliminary insights\n\nOutput structured analysis with citations."
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "SequentialAnalyzer",
+        "type": "MCPTool",
+        "position": { "x": 500, "y": 550 },
+        "data": {
+          "node": {
+            "display_name": "💭 SEQUENTIAL THINKING",
+            "template": {
+              "mcp_server": { "type": "str", "value": "sequential-thinking" },
+              "tool_name": { "type": "str", "value": "thinking" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "thought": "Analyze combined research findings",
+                  "process": "deep_analysis",
+                  "max_steps": 10,
+                  "store_in_memory": true
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "CodeGenerator",
+        "type": "Agent",
+        "position": { "x": 700, "y": 450 },
+        "data": {
+          "node": {
+            "display_name": "💻 CODE GENERATOR",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are an expert coder. Write production-ready code based on requirements.\n\nRequirements:\n- Clean, documented code\n- Error handling\n- Security best practices\n- Performance optimized\n- Include tests\n\nYour code WILL be reviewed. Write high quality initially to minimize revisions."
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.2 }
+            }
+          }
+        }
+      },
+      {
+        "id": "TestGenerator",
+        "type": "Agent",
+        "position": { "x": 850, "y": 450 },
+        "data": {
+          "node": {
+            "display_name": "🧪 TEST GENERATOR",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Test Engineer. Create comprehensive test suites.\n\nRequirements:\n- 90%+ coverage\n- Edge cases\n- Integration tests\n- Performance tests\n- Clear assertions\n\nTests will be reviewed for completeness."
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "QualityReviewer",
+        "type": "Agent",
+        "position": { "x": 775, "y": 600 },
+        "data": {
+          "node": {
+            "display_name": "👁️ QUALITY REVIEWER [QA GATE]",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are the QUALITY GATE. Every output MUST pass through you.\n\nAssessment Criteria:\n✅ APPROVED - Excellent quality, no issues\n⚠️ MINOR - Small issues, can proceed with notes\n❌ MAJOR - Significant issues, MUST REVISE\n\nFor MAJOR issues:\n- Specific line-by-line feedback\n- Clear revision instructions\n- Examples of correct approach\n- Return to original agent\n\nBe thorough but constructive. Quality is NON-NEGOTIABLE.\n\nTrack all reviews in Memory MCP."
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.2 }
+            }
+          }
+        }
+      },
+      {
+        "id": "ReviewRouter",
+        "type": "ConditionalRouter",
+        "position": { "x": 775, "y": 750 },
+        "data": {
+          "node": {
+            "display_name": "🚦 REVIEW ROUTER",
+            "template": {
+              "conditions": {
+                "type": "list",
+                "value": [
+                  { "label": "APPROVED", "condition": "review_status == 'approved'" },
+                  { "label": "MINOR", "condition": "review_status == 'minor'" },
+                  { "label": "MAJOR", "condition": "review_status == 'major'" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "RevisionTracker",
+        "type": "MCPTool",
+        "position": { "x": 950, "y": 750 },
+        "data": {
+          "node": {
+            "display_name": "📝 REVISION TRACKER",
+            "template": {
+              "mcp_server": { "type": "str", "value": "taskbus" },
+              "tool_name": { "type": "str", "value": "track_revision" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "max_cycles": 3,
+                  "log_quality": true
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "KnowledgeStore",
+        "type": "MCPTool",
+        "position": { "x": 500, "y": 800 },
+        "data": {
+          "node": {
+            "display_name": "🧠 KNOWLEDGE STORE",
+            "template": {
+              "mcp_server": { "type": "str", "value": "memory" },
+              "tool_name": { "type": "str", "value": "create_entity" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "name": "Task_{task_id}",
+                  "entityType": "mega_flow_execution",
+                  "observations": []
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "TaskLogger",
+        "type": "MCPTool",
+        "position": { "x": 200, "y": 800 },
+        "data": {
+          "node": {
+            "display_name": "📋 TASK LOGGER",
+            "template": {
+              "mcp_server": { "type": "str", "value": "taskbus" },
+              "tool_name": { "type": "str", "value": "create_run" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "name": "Mega Flow Execution",
+                  "track_progress": true
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "FinalSynthesizer",
+        "type": "Agent",
+        "position": { "x": 500, "y": 900 },
+        "data": {
+          "node": {
+            "display_name": "✨ FINAL SYNTHESIZER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are the Final Synthesizer. Combine all agent outputs into a comprehensive, polished final deliverable.\n\nInputs:\n- Research data (Tavily + Perplexity)\n- Analysis insights (Deep Analyzer)\n- Sequential thinking results\n- Code solutions (if applicable)\n- Test suites (if applicable)\n- Quality review notes\n\nOutput Requirements:\n1. Executive Summary (3-4 sentences)\n2. Detailed Findings with citations\n3. Actionable Recommendations\n4. Risk Assessment\n5. Next Steps\n6. All sources cited with URLs\n\nFormat professionally. This is the FINAL output."
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "FinalOutput",
+        "type": "ChatOutput",
+        "position": { "x": 500, "y": 1000 },
+        "data": {
+          "node": {
+            "display_name": "📊 FINAL DELIVERABLE",
+            "template": {
+              "message": { "type": "str", "required": true }
+            }
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "UserInput",
+        "target": "TaskClassifier",
+        "sourceHandle": "input_value",
+        "targetHandle": "input"
+      },
+      {
+        "source": "TaskClassifier",
+        "target": "Orchestrator",
+        "sourceHandle": "classification",
+        "targetHandle": "task_info"
+      },
+      {
+        "source": "Orchestrator",
+        "target": "ParallelDispatcher",
+        "sourceHandle": "dispatch",
+        "targetHandle": "trigger"
+      },
+      {
+        "source": "ParallelDispatcher",
+        "target": "TavilyResearcher",
+        "sourceHandle": "tavily",
+        "targetHandle": "research_query"
+      },
+      {
+        "source": "ParallelDispatcher",
+        "target": "PerplexityResearcher",
+        "sourceHandle": "perplexity",
+        "targetHandle": "research_query"
+      },
+      {
+        "source": "ParallelDispatcher",
+        "target": "DeepAnalyzer",
+        "sourceHandle": "analyzer",
+        "targetHandle": "task"
+      },
+      {
+        "source": "TavilyResearcher",
+        "target": "DeepAnalyzer",
+        "sourceHandle": "results",
+        "targetHandle": "tavily_data"
+      },
+      {
+        "source": "PerplexityResearcher",
+        "target": "DeepAnalyzer",
+        "sourceHandle": "results",
+        "targetHandle": "perplexity_data"
+      },
+      {
+        "source": "DeepAnalyzer",
+        "target": "SequentialAnalyzer",
+        "sourceHandle": "analysis",
+        "targetHandle": "data"
+      },
+      {
+        "source": "Orchestrator",
+        "target": "CodeGenerator",
+        "sourceHandle": "code_task",
+        "targetHandle": "requirements"
+      },
+      {
+        "source": "Orchestrator",
+        "target": "TestGenerator",
+        "sourceHandle": "test_task",
+        "targetHandle": "code"
+      },
+      {
+        "source": "CodeGenerator",
+        "target": "QualityReviewer",
+        "sourceHandle": "code",
+        "targetHandle": "output"
+      },
+      {
+        "source": "TestGenerator",
+        "target": "QualityReviewer",
+        "sourceHandle": "tests",
+        "targetHandle": "output"
+      },
+      {
+        "source": "QualityReviewer",
+        "target": "ReviewRouter",
+        "sourceHandle": "assessment",
+        "targetHandle": "review_status"
+      },
+      {
+        "source": "ReviewRouter",
+        "target": "RevisionTracker",
+        "sourceHandle": "MAJOR",
+        "targetHandle": "revision"
+      },
+      {
+        "source": "ReviewRouter",
+        "target": "KnowledgeStore",
+        "sourceHandle": "APPROVED",
+        "targetHandle": "data"
+      },
+      {
+        "source": "ReviewRouter",
+        "target": "KnowledgeStore",
+        "sourceHandle": "MINOR",
+        "targetHandle": "data"
+      },
+      {
+        "source": "SequentialAnalyzer",
+        "target": "KnowledgeStore",
+        "sourceHandle": "insights",
+        "targetHandle": "analysis"
+      },
+      {
+        "source": "KnowledgeStore",
+        "target": "FinalSynthesizer",
+        "sourceHandle": "all_data",
+        "targetHandle": "inputs"
+      },
+      {
+        "source": "FinalSynthesizer",
+        "target": "FinalOutput",
+        "sourceHandle": "final_report",
+        "targetHandle": "message"
+      },
+      {
+        "source": "TaskClassifier",
+        "target": "TaskLogger",
+        "sourceHandle": "task_info",
+        "targetHandle": "task"
+      }
+    ]
+  },
+  "tags": ["mega-flow", "multi-agent", "parallel", "sequential", "mcp", "review-loops", "ultimate"],
+  "mcp_servers": [
+    "tavily", "perplexity", "memory", "taskbus", "sequential-thinking",
+    "filesystem", "github", "fetch", "codebase-map", "postgres",
+    "playwright", "computer-control", "context-compactor", "parallel"
+  ],
+  "agents": 10,
+  "mcp_tools": 14,
+  "validation_points": 5,
+  "max_revisions": 15
+}
