@@ -1,0 +1,149 @@
+{
+  "name": "🔬 Research Report Analyzer",
+  "description": "Specialized for analyzing research reports, extracting findings, data points, and trends",
+  "version": "1.0.0",
+  "endpoint_name": "research_analyzer",
+  "icon": "Microscope",
+  "gradient": "blue",
+  "data": {
+    "nodes": [
+      {
+        "id": "FileInput",
+        "type": "File",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "📄 Research Report",
+            "template": {
+              "file_path": {
+                "type": "file",
+                "required": true,
+                "display_name": "Upload Research Report",
+                "file_types": [".pdf", ".docx", ".txt"]
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "QueryInput",
+        "type": "ChatInput",
+        "position": { "x": 100, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "❓ Research Question",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "What would you like to know? (e.g., 'What are the key findings?', 'Extract all data points', 'What are the limitations?')",
+                "value": "Summarize the key findings and methodology"
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "ResearchExtractor",
+        "type": "Agent",
+        "position": { "x": 400, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "📊 Research Data Extractor",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Research Data Extraction Specialist. Your job is to systematically extract all relevant information from research reports.\n\nExtract and structure:\n\n1. **Study Metadata**\n   - Title, authors, date\n   - Research institution/organization\n   - Study type (experimental, observational, review, etc.)\n\n2. **Key Findings**\n   - Primary outcomes\n   - Statistical significance\n   - Effect sizes\n   - All quantitative data points\n\n3. **Methodology**\n   - Sample size and characteristics\n   - Data collection methods\n   - Analysis techniques\n   - Tools/technologies used\n\n4. **Data Points** (in table format)\n   - Variable | Value | Unit | Context\n\n5. **Limitations & Biases**\n   - Study limitations\n   - Potential biases\n   - Confounding factors\n\n6. **Conclusions & Recommendations**\n   - Author conclusions\n   - Practical implications\n   - Future research needs\n\nBe thorough - extract every data point and finding."
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "TrendAnalyzer",
+        "type": "Agent",
+        "position": { "x": 400, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "📈 Trend & Pattern Analyzer",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Trend Analysis Expert. Analyze the extracted research data to identify patterns, trends, and insights.\n\nAnalysis Dimensions:\n\n1. **Temporal Trends**\n   - How do findings change over time?\n   - Are there seasonal patterns?\n   - Growth rates and trajectories\n\n2. **Comparative Analysis**\n   - How do different groups/populations compare?\n   - Benchmark against industry standards\n   - Identify outliers and anomalies\n\n3. **Correlation & Causation**\n   - Identify relationships between variables\n   - Distinguish correlation from causation\n   - Note any predictive patterns\n\n4. **Risk Assessment**\n   - Identify risks mentioned\n   - Assess confidence levels\n   - Note uncertainty ranges\n\n5. **Strategic Implications**\n   - Business implications\n   - Policy recommendations\n   - Investment considerations\n\nFormat:\n## Trend Analysis\n[Overall patterns identified]\n\n## Key Statistics\n• [Stat 1]\n• [Stat 2]\n• [Stat 3]\n\n## Critical Insights\n🔍 [Critical insight 1]\n🔍 [Critical insight 2]\n\n## Strategic Recommendations\n💡 [Recommendation 1]\n💡 [Recommendation 2]"
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "ReportGenerator",
+        "type": "Agent",
+        "position": { "x": 700, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "📋 Executive Report Generator",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are an Executive Report Writer. Create a comprehensive yet concise report suitable for C-level executives and decision-makers.\n\nReport Structure:\n\n# Executive Summary\n[One paragraph: What was studied, key finding, bottom line impact]\n\n# Key Findings\n## Primary Outcome\n[Main result with numbers]\n\n## Secondary Findings\n[Supporting results]\n\n## Surprising Insights\n[Unexpected discoveries]\n\n# Business Implications\n## Opportunities\n[What's the upside?]\n\n## Risks & Mitigation\n[What could go wrong?]\n\n## Action Required\n[What should leadership do?]\n\n# Data Highlights\n| Metric | Value | Significance |\n|--------|-------|--------------|\n| [Key metric 1] | [Value] | [Why it matters] |\n| [Key metric 2] | [Value] | [Why it matters] |\n\n# Methodology Note\n[1-2 sentences on study quality/credibility]\n\n# Next Steps\n1. [Immediate action]\n2. [Short-term follow-up]\n3. [Long-term consideration]\n\nStyle: Professional, data-driven, actionable"
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.2 }
+            }
+          }
+        }
+      },
+      {
+        "id": "Output",
+        "type": "ChatOutput",
+        "position": { "x": 1000, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "📊 Research Analysis Report",
+            "template": {
+              "message": { "type": "str", "required": true }
+            }
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "FileInput",
+        "target": "ResearchExtractor",
+        "sourceHandle": "file_path",
+        "targetHandle": "document"
+      },
+      {
+        "source": "ResearchExtractor",
+        "target": "TrendAnalyzer",
+        "sourceHandle": "extracted_data",
+        "targetHandle": "data"
+      },
+      {
+        "source": "QueryInput",
+        "target": "TrendAnalyzer",
+        "sourceHandle": "input_value",
+        "targetHandle": "focus_area"
+      },
+      {
+        "source": "TrendAnalyzer",
+        "target": "ReportGenerator",
+        "sourceHandle": "analysis",
+        "targetHandle": "insights"
+      },
+      {
+        "source": "ReportGenerator",
+        "target": "Output",
+        "sourceHandle": "report",
+        "targetHandle": "message"
+      }
+    ]
+  },
+  "tags": ["research", "analysis", "data-extraction", "trends"]
+}

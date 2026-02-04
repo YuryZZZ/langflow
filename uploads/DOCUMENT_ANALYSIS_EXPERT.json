@@ -1,0 +1,150 @@
+{
+  "name": "📄 Document Analysis Expert",
+  "description": "Specialized flow for analyzing research reports, PRDs, and technical documents with deep insights",
+  "version": "1.0.0",
+  "endpoint_name": "document_analysis_expert",
+  "icon": "FileText",
+  "gradient": "purple",
+  "data": {
+    "nodes": [
+      {
+        "id": "FileUpload",
+        "type": "File",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "📎 Upload Document",
+            "template": {
+              "file_path": {
+                "type": "file",
+                "required": false,
+                "display_name": "Document",
+                "file_types": [".pdf", ".docx", ".txt", ".md"],
+                "multiple": true
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "ChatInput",
+        "type": "ChatInput",
+        "position": { "x": 100, "y": 250 },
+        "data": {
+          "node": {
+            "display_name": "❓ Analysis Request",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "What would you like to analyze? (e.g., 'Summarize key findings', 'Extract technical requirements', 'Identify risks')",
+                "display_name": "Your Question"
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "DocumentClassifier",
+        "type": "Agent",
+        "position": { "x": 400, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "🏷️ Document Classifier",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Document Classification Specialist. Analyze the uploaded document and classify it into one of these categories:\n\n1. **Research Report** - Academic or industry research with findings, data, analysis\n2. **Product Requirements Document (PRD)** - Product specs, features, user stories\n3. **Technical Architecture** - System design, infrastructure, technical specifications\n4. **Business Strategy** - Market analysis, business plans, strategic documents\n5. **Legal/Compliance** - Contracts, policies, regulatory documents\n\nOutput format:\nDocument Type: [category]\nConfidence: [high/medium/low]\nKey Indicators: [what signals indicate this type]\nRecommended Analysis Approach: [how to best analyze this document]"
+              },
+              "model": { "type": "str", "value": "gpt-4o-mini" }
+            }
+          }
+        }
+      },
+      {
+        "id": "DocumentAnalyzer",
+        "type": "Agent",
+        "position": { "x": 400, "y": 250 },
+        "data": {
+          "node": {
+            "display_name": "🔍 Deep Document Analyzer",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are an Expert Document Analyst with deep domain knowledge across research, product, and technical domains.\n\nYour task: Analyze the document thoroughly and provide comprehensive insights based on the user's question.\n\nCapabilities:\n- Extract key findings and conclusions\n- Identify technical requirements and specifications\n- Summarize complex information clearly\n- Detect risks, issues, and gaps\n- Compare against best practices\n- Provide actionable recommendations\n\nAnalysis Guidelines:\n1. Read the document content carefully\n2. Understand the user's specific question\n3. Extract relevant information\n4. Structure your response logically\n5. Cite specific sections when possible\n6. Be thorough but concise"
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.3 }
+            }
+          }
+        }
+      },
+      {
+        "id": "InsightSynthesizer",
+        "type": "Agent",
+        "position": { "x": 700, "y": 250 },
+        "data": {
+          "node": {
+            "display_name": "💡 Insight Synthesizer",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are an Insight Synthesis Expert. Take the raw analysis and transform it into actionable insights.\n\nYour job:\n1. Identify patterns and trends\n2. Connect dots between different sections\n3. Highlight critical insights\n4. Prioritize recommendations by impact\n5. Format for easy reading\n\nOutput Structure:\n## Executive Summary\n[2-3 sentences capturing the essence]\n\n## Key Insights\n• [Insight 1 with supporting evidence]\n• [Insight 2 with supporting evidence]\n• [Insight 3 with supporting evidence]\n\n## Action Items\n🔴 High Priority: [action]\n🟡 Medium Priority: [action]\n🟢 Low Priority: [action]\n\n## Questions to Consider\n[2-3 follow-up questions for deeper analysis]"
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "ChatOutput",
+        "type": "ChatOutput",
+        "position": { "x": 1000, "y": 250 },
+        "data": {
+          "node": {
+            "display_name": "📊 Analysis Report",
+            "template": {
+              "message": { "type": "str", "required": true }
+            }
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "FileUpload",
+        "target": "DocumentClassifier",
+        "sourceHandle": "file_path",
+        "targetHandle": "input"
+      },
+      {
+        "source": "DocumentClassifier",
+        "target": "DocumentAnalyzer",
+        "sourceHandle": "classification",
+        "targetHandle": "context"
+      },
+      {
+        "source": "ChatInput",
+        "target": "DocumentAnalyzer",
+        "sourceHandle": "input_value",
+        "targetHandle": "question"
+      },
+      {
+        "source": "DocumentAnalyzer",
+        "target": "InsightSynthesizer",
+        "sourceHandle": "analysis",
+        "targetHandle": "raw_analysis"
+      },
+      {
+        "source": "InsightSynthesizer",
+        "target": "ChatOutput",
+        "sourceHandle": "insights",
+        "targetHandle": "message"
+      }
+    ]
+  },
+  "tags": ["document-analysis", "research", "prd", "architecture"]
+}
