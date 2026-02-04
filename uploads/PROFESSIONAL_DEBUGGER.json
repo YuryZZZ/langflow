@@ -1,0 +1,381 @@
+{
+  "name": "🐛 PROFESSIONAL DEBUGGER - Code Execution Analysis",
+  "description": "Professional debugging system with error detection, root cause analysis, stack trace parsing, fix generation, and verification. The ultimate debugging flow for Langflow code execution.",
+  "version": "2.0.0",
+  "endpoint_name": "professional_debugger",
+  "icon": "Bug",
+  "gradient": "red",
+  "data": {
+    "nodes": [
+      {
+        "id": "ErrorInput",
+        "type": "ChatInput",
+        "position": { "x": 500, "y": 0 },
+        "data": {
+          "node": {
+            "display_name": "🚨 ERROR INPUT",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "Paste error message, stack trace, or describe the bug...",
+                "display_name": "Error Description"
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "CodeInput",
+        "type": "File",
+        "position": { "x": 300, "y": 0 },
+        "data": {
+          "node": {
+            "display_name": "📎 ATTACH CODE",
+            "template": {
+              "file_path": {
+                "type": "file",
+                "required": false,
+                "display_name": "Upload Code File",
+                "file_types": [".py", ".js", ".ts", ".json", ".md"]
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "ErrorClassifier",
+        "type": "Agent",
+        "position": { "x": 500, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "🔍 ERROR CLASSIFIER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are an Error Classification Specialist. Analyze error messages and classify them into categories.\n\nError Types:\n1. SYNTAX_ERROR - Code structure issues, missing brackets, indentation\n2. RUNTIME_ERROR - Exceptions during execution (TypeError, ValueError, etc.)\n3. LOGIC_ERROR - Code runs but produces wrong results\n4. PERFORMANCE_ERROR - Slow execution, memory issues\n5. NETWORK_ERROR - API calls, connection issues\n6. DATABASE_ERROR - SQL, query, connection issues\n7. SECURITY_ERROR - Authentication, authorization, vulnerabilities\n8. CONFIGURATION_ERROR - Environment, settings, missing variables\n9. DEPENDENCY_ERROR - Missing packages, version conflicts\n10. TIMEOUT_ERROR - Execution took too long\n\nOutput JSON:\n{\n  \"error_type\": \"runtime_error\",\n  \"severity\": \"high\",\n  \"language\": \"python\",\n  \"likely_cause\": \"null_pointer\",\n  \"file_location\": \"app.py:45\",\n  \"debug_strategy\": \"trace_variables\",\n  \"tools_needed\": [\"stack_trace\", \"variable_inspector\"]\n}"
+              },
+              "model": { "type": "str", "value": "gpt-4o-mini" }
+            }
+          }
+        }
+      },
+      {
+        "id": "StackTraceParser",
+        "type": "Agent",
+        "position": { "x": 300, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "📋 STACK TRACE PARSER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Stack Trace Analysis Expert. Parse error stack traces and extract key information.\n\nParse and Extract:\n1. Error type and message\n2. File names and line numbers\n3. Function/method call chain\n4. Variable states (if available)\n5. Root cause location\n\nOutput Format:\n## Stack Trace Analysis\n\n**Error Type**: [Type]\n**Error Message**: [Message]\n\n**Call Chain**:\n1. [File]:[Line] - [Function]\n2. [File]:[Line] - [Function]\n3. [File]:[Line] - [Function] ← **ROOT CAUSE LOCATION**\n\n**Key Variables**:\n- var1: [value]\n- var2: [value]\n\n**Most Likely Issue**: [Description]"
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "RootCauseAnalyzer",
+        "type": "Agent",
+        "position": { "x": 700, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "🔬 ROOT CAUSE ANALYZER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Root Cause Analysis Expert. Use chain-of-thought reasoning to identify the fundamental cause of bugs.\n\nAnalysis Method:\n1. Observe symptoms from error\n2. Generate multiple hypotheses\n3. Evaluate evidence for/against each\n4. Select most likely root cause\n5. Verify hypothesis\n\nOutput Format:\n## Root Cause Analysis\n\n### Symptoms\n- [What we observe]\n\n### Hypothesis 1: [Theory]\n**Evidence For**:\n- [Fact 1]\n- [Fact 2]\n\n**Evidence Against**:\n- [Fact 1]\n\n**Likelihood**: HIGH/MEDIUM/LOW\n\n### Hypothesis 2: [Theory]\n...\n\n### Selected Root Cause\n**Most Likely**: [Hypothesis X]\n**Confidence**: [90%]\n**Reasoning**: [Step-by-step explanation]\n\n### Verification\n**To Confirm**: [Specific test or check]"
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.3 }
+            }
+          }
+        }
+      },
+      {
+        "id": "VariableInspector",
+        "type": "MCPTool",
+        "position": { "x": 100, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "🔍 VARIABLE INSPECTOR",
+            "template": {
+              "mcp_server": { "type": "str", "value": "codebase-map" },
+              "tool_name": { "type": "str", "value": "analyze_variables" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "file_path": "{error_file}",
+                  "line_number": "{error_line}",
+                  "extract_context": 10
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "SequentialDebugger",
+        "type": "MCPTool",
+        "position": { "x": 300, "y": 400 },
+        "data": {
+          "node": {
+            "display_name": "💭 DEBUGGING CHAIN",
+            "template": {
+              "mcp_server": { "type": "str", "value": "sequential-thinking" },
+              "tool_name": { "type": "str", "value": "thinking" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "thought": "Debug the error systematically",
+                  "process": "debug_analysis",
+                  "max_steps": 8,
+                  "store_in_memory": true
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "FixGenerator",
+        "type": "Agent",
+        "position": { "x": 500, "y": 400 },
+        "data": {
+          "node": {
+            "display_name": "🔧 FIX GENERATOR",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Fix Generation Expert. Create precise, minimal fixes for identified bugs.\n\nFix Requirements:\n1. Minimal changes (3-15 lines preferred)\n2. Clear explanation of fix\n3. No side effects or regressions\n4. Follow code style conventions\n5. Include error handling if needed\n\nOutput Format:\n## Proposed Fix\n\n**File**: [path/to/file]\n**Lines**: [X-Y]\n\n**Current Code**:\n```python\n[problematic code]\n```\n\n**Fixed Code**:\n```python\n[corrected code]\n```\n\n**Explanation**: [Why this fixes the bug]\n\n**Testing**: [How to verify the fix]"
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.2 }
+            }
+          }
+        }
+      },
+      {
+        "id": "TestGenerator",
+        "type": "Agent",
+        "position": { "x": 700, "y": 400 },
+        "data": {
+          "node": {
+            "display_name": "🧪 TEST GENERATOR",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Test Engineer. Create tests to verify bug fixes and prevent regressions.\n\nTest Requirements:\n1. Test the specific bug scenario\n2. Test edge cases\n3. Test error conditions\n4. 90%+ code coverage target\n5. Clear assertions\n\nOutput Format:\n## Test Cases for Bug Fix\n\n### Test 1: Original Bug Scenario\n```python\ndef test_original_bug():\n    # Arrange\n    input_data = [...]\n    \n    # Act\n    result = function_to_test(input_data)\n    \n    # Assert\n    assert result == expected_output\n```\n\n### Test 2: Edge Case\n...\n\n### Test 3: Error Condition\n...\n\n**Coverage**: [Expected coverage %]\n**Run Command**: `pytest test_file.py -v`"
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "CodeReviewer",
+        "type": "Agent",
+        "position": { "x": 500, "y": 550 },
+        "data": {
+          "node": {
+            "display_name": "👁️ CODE REVIEWER",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Code Review Specialist. Review bug fixes for quality and correctness.\n\nReview Checklist:\n✅ Fix addresses root cause (not just symptoms)\n✅ No side effects or regressions\n✅ Code follows style guidelines\n✅ Proper error handling\n✅ Tests cover the fix\n✅ Documentation updated (if needed)\n\nAssessment:\n- APPROVED: Fix is correct and complete\n- MINOR: Small improvements suggested\n- MAJOR: Significant issues, needs revision\n\nProvide specific, actionable feedback."
+              },
+              "model": { "type": "str", "value": "gpt-4o" },
+              "temperature": { "type": "float", "value": 0.2 }
+            }
+          }
+        }
+      },
+      {
+        "id": "KnowledgeLogger",
+        "type": "MCPTool",
+        "position": { "x": 300, "y": 550 },
+        "data": {
+          "node": {
+            "display_name": "🧠 KNOWLEDGE LOGGER",
+            "template": {
+              "mcp_server": { "type": "str", "value": "memory" },
+              "tool_name": { "type": "str", "value": "create_entity" },
+              "parameters": {
+                "type": "dict",
+                "value": {
+                  "name": "Bug_{error_hash}",
+                  "entityType": "bug_fix",
+                  "observations": []
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "DebugReport",
+        "type": "Agent",
+        "position": { "x": 500, "y": 700 },
+        "data": {
+          "node": {
+            "display_name": "📊 DEBUG REPORT",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "value": "You are a Debug Report Generator. Create comprehensive professional debug reports.\n\nReport Structure:\n# Debug Report\n\n## Executive Summary\n- Bug severity and impact\n- Root cause (one sentence)\n- Fix status\n\n## Error Analysis\n- Error type and classification\n- Stack trace summary\n- Affected components\n\n## Root Cause\n- Detailed explanation\n- Evidence and reasoning\n- Why it happened\n\n## Solution Implemented\n- Code changes\n- Files modified\n- Lines changed\n\n## Testing\n- Test cases created\n- Verification results\n- Coverage metrics\n\n## Prevention\n- How to avoid similar bugs\n- Code review checklist updates\n- Monitoring improvements\n\n## Status\n- ✅ FIXED and VERIFIED\n- Ready for deployment"
+              },
+              "model": { "type": "str", "value": "gpt-4o" }
+            }
+          }
+        }
+      },
+      {
+        "id": "FinalOutput",
+        "type": "ChatOutput",
+        "position": { "x": 500, "y": 850 },
+        "data": {
+          "node": {
+            "display_name": "✅ DEBUG COMPLETE",
+            "template": {
+              "message": { "type": "str", "required": true }
+            }
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "ErrorInput",
+        "target": "ErrorClassifier",
+        "sourceHandle": "input_value",
+        "targetHandle": "error"
+      },
+      {
+        "source": "CodeInput",
+        "target": "StackTraceParser",
+        "sourceHandle": "file_path",
+        "targetHandle": "code"
+      },
+      {
+        "source": "ErrorInput",
+        "target": "StackTraceParser",
+        "sourceHandle": "input_value",
+        "targetHandle": "error_message"
+      },
+      {
+        "source": "ErrorClassifier",
+        "target": "RootCauseAnalyzer",
+        "sourceHandle": "classification",
+        "targetHandle": "error_info"
+      },
+      {
+        "source": "StackTraceParser",
+        "target": "RootCauseAnalyzer",
+        "sourceHandle": "parsed_trace",
+        "targetHandle": "trace_info"
+      },
+      {
+        "source": "StackTraceParser",
+        "target": "VariableInspector",
+        "sourceHandle": "file_info",
+        "targetHandle": "location"
+      },
+      {
+        "source": "VariableInspector",
+        "target": "SequentialDebugger",
+        "sourceHandle": "variables",
+        "targetHandle": "context"
+      },
+      {
+        "source": "RootCauseAnalyzer",
+        "target": "SequentialDebugger",
+        "sourceHandle": "root_cause",
+        "targetHandle": "analysis"
+      },
+      {
+        "source": "SequentialDebugger",
+        "target": "FixGenerator",
+        "sourceHandle": "debug_chain",
+        "targetHandle": "debug_info"
+      },
+      {
+        "source": "RootCauseAnalyzer",
+        "target": "FixGenerator",
+        "sourceHandle": "root_cause",
+        "targetHandle": "cause"
+      },
+      {
+        "source": "FixGenerator",
+        "target": "TestGenerator",
+        "sourceHandle": "fix",
+        "targetHandle": "code_change"
+      },
+      {
+        "source": "FixGenerator",
+        "target": "CodeReviewer",
+        "sourceHandle": "fix",
+        "targetHandle": "proposed_fix"
+      },
+      {
+        "source": "TestGenerator",
+        "target": "CodeReviewer",
+        "sourceHandle": "tests",
+        "targetHandle": "test_suite"
+      },
+      {
+        "source": "CodeReviewer",
+        "target": "KnowledgeLogger",
+        "sourceHandle": "review_notes",
+        "targetHandle": "fix_info"
+      },
+      {
+        "source": "CodeReviewer",
+        "target": "DebugReport",
+        "sourceHandle": "approved_fix",
+        "targetHandle": "fix_details"
+      },
+      {
+        "source": "RootCauseAnalyzer",
+        "target": "DebugReport",
+        "sourceHandle": "analysis",
+        "targetHandle": "root_cause_details"
+      },
+      {
+        "source": "TestGenerator",
+        "target": "DebugReport",
+        "sourceHandle": "tests",
+        "targetHandle": "test_details"
+      },
+      {
+        "source": "DebugReport",
+        "target": "FinalOutput",
+        "sourceHandle": "report",
+        "targetHandle": "message"
+      }
+    ]
+  },
+  "tags": ["debugging", "error-handling", "code-analysis", "bug-fix", "professional"],
+  "mcp_servers": ["sequential-thinking", "memory", "codebase-map"],
+  "agents": 8,
+  "debugging_capabilities": [
+    "Error classification",
+    "Stack trace parsing",
+    "Root cause analysis",
+    "Variable inspection",
+    "Chain-of-thought debugging",
+    "Fix generation",
+    "Test generation",
+    "Code review",
+    "Knowledge logging"
+  ]
+}
