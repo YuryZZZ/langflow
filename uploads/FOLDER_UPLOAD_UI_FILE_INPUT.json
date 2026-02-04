@@ -1,0 +1,292 @@
+{
+  "name": "📁 File Upload UI + Auto RAG",
+  "description": "Langflow UI with file upload component - users can upload files directly in the web interface",
+  "version": "3.0.0",
+  "endpoint_name": "file_upload_ui",
+  "icon": "FileUp",
+  "gradient": "green",
+  "data": {
+    "nodes": [
+      {
+        "id": "FileUpload-UI",
+        "type": "File",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "📎 File Upload",
+            "template": {
+              "file_path": {
+                "type": "file",
+                "required": false,
+                "display_name": "Upload File",
+                "file_types": [".pdf", ".docx", ".txt", ".md", ".html", ".py", ".js", ".json", ".csv", ".xlsx"],
+                "multiple": true,
+                "description": "Upload one or more files to process"
+              },
+              "save_directory": {
+                "type": "str",
+                "required": false,
+                "display_name": "Save To",
+                "value": "uploads/documents",
+                "description": "Directory to save uploaded files"
+              }
+            },
+            "description": "File upload component for Langflow UI"
+          }
+        }
+      },
+      {
+        "id": "ChatInput-Query",
+        "type": "ChatInput",
+        "position": { "x": 100, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "💬 Ask About Documents",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "Upload files above, then ask questions about them...",
+                "display_name": "Your Question"
+              }
+            },
+            "description": "User question about uploaded documents"
+          }
+        }
+      },
+      {
+        "id": "Agent-FileProcessor",
+        "type": "Agent",
+        "position": { "x": 400, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "⚙️ Auto File Processor",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "System Prompt",
+                "value": "You are a File Processing Agent. When files are uploaded:\n\n1. Save files to: uploads/documents/\n2. Extract text content from each file\n3. Split into chunks (1000 chars, 200 overlap)\n4. Generate embeddings\n5. Store in FAISS vector database\n6. Return processing summary\n\nSupported formats: PDF, DOCX, TXT, MD, HTML, code files, CSV, Excel\n\nOutput format:\n📊 Processing Complete\n• Files processed: {count}\n• Total chunks: {chunks}\n• Status: ✅ Ready for queries"
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "display_name": "Model",
+                "value": "gpt-4o-mini"
+              }
+            },
+            "description": "Automatically processes uploaded files"
+          }
+        }
+      },
+      {
+        "id": "MCP-VectorSearch",
+        "type": "MCPTool",
+        "position": { "x": 400, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "🔍 Vector Search",
+            "template": {
+              "mcp_server": {
+                "type": "str",
+                "required": true,
+                "display_name": "MCP Server",
+                "value": "memory"
+              },
+              "tool_name": {
+                "type": "str",
+                "required": true,
+                "display_name": "Tool",
+                "value": "search_nodes"
+              },
+              "parameters": {
+                "type": "dict",
+                "required": true,
+                "display_name": "Parameters",
+                "value": {
+                  "query": "{user_question}",
+                  "top_k": 5,
+                  "vector_store_path": "uploads/vector_store"
+                }
+              }
+            },
+            "description": "Searches uploaded documents for relevant content"
+          }
+        }
+      },
+      {
+        "id": "Prompt-ContextBuilder",
+        "type": "Prompt",
+        "position": { "x": 700, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "📝 Context Builder",
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "Template",
+                "value": "## 📚 Context from Your Uploaded Documents\n\n{retrieved_chunks}\n\n---\n\n## ❓ Your Question\n{user_question}\n\n---\n\n## 🎯 Instructions\nAnswer based ONLY on the uploaded documents above.\nIf the answer isn't in the documents, say so clearly.\nCite specific document names when possible.\n\n## 💬 Answer:"
+              }
+            },
+            "description": "Builds prompt with document context"
+          }
+        }
+      },
+      {
+        "id": "Agent-Response",
+        "type": "Agent",
+        "position": { "x": 1000, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "🤖 Answer Generator",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "System Prompt",
+                "value": "You are a helpful assistant answering questions based on uploaded documents.\n\nGuidelines:\n- Use ONLY the provided document context\n- Be accurate and factual\n- Cite document sources\n- If uncertain, say \"Based on the uploaded documents, I don't have enough information to answer that.\"\n- Provide clear, helpful answers"
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "display_name": "Model",
+                "value": "gpt-4o"
+              },
+              "temperature": {
+                "type": "float",
+                "required": false,
+                "display_name": "Temperature",
+                "value": 0.2
+              }
+            },
+            "description": "Generates answers from document context"
+          }
+        }
+      },
+      {
+        "id": "Status-Display",
+        "type": "Prompt",
+        "position": { "x": 700, "y": 50 },
+        "data": {
+          "node": {
+            "display_name": "📊 Status Display",
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "Template",
+                "value": "✅ **Files Uploaded Successfully!**\n\n📎 Files: {file_count}\n📁 Location: uploads/documents/\n⚙️ Status: Processing...\n🧠 Vector Store: Updating\n\n⏳ Please wait a moment, then ask questions about your documents!"
+              }
+            },
+            "description": "Shows upload status to user"
+          }
+        }
+      },
+      {
+        "id": "ChatOutput-Response",
+        "type": "ChatOutput",
+        "position": { "x": 1300, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "💬 Answer",
+            "template": {
+              "message": {
+                "type": "str",
+                "required": true,
+                "display_name": "Response"
+              }
+            },
+            "description": "Final answer to user"
+          }
+        }
+      },
+      {
+        "id": "Combine-Results",
+        "type": "CombineText",
+        "position": { "x": 1300, "y": 350 },
+        "data": {
+          "node": {
+            "display_name": "📋 Combine Results",
+            "template": {
+              "text1": {
+                "type": "str",
+                "required": true,
+                "display_name": "Main Response"
+              },
+              "text2": {
+                "type": "str",
+                "required": false,
+                "display_name": "Sources",
+                "value": "\n\n---\n📚 *Sources: {source_documents}*"
+              }
+            },
+            "description": "Combines answer with source citations"
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-file-processor",
+        "source": "FileUpload-UI",
+        "target": "Agent-FileProcessor",
+        "sourceHandle": "file_path",
+        "targetHandle": "input"
+      },
+      {
+        "id": "edge-processor-status",
+        "source": "Agent-FileProcessor",
+        "target": "Status-Display",
+        "sourceHandle": "summary",
+        "targetHandle": "file_count"
+      },
+      {
+        "id": "edge-query-search",
+        "source": "ChatInput-Query",
+        "target": "MCP-VectorSearch",
+        "sourceHandle": "input_value",
+        "targetHandle": "user_question"
+      },
+      {
+        "id": "edge-search-context",
+        "source": "MCP-VectorSearch",
+        "target": "Prompt-ContextBuilder",
+        "sourceHandle": "results",
+        "targetHandle": "retrieved_chunks"
+      },
+      {
+        "id": "edge-query-context",
+        "source": "ChatInput-Query",
+        "target": "Prompt-ContextBuilder",
+        "sourceHandle": "input_value",
+        "targetHandle": "user_question"
+      },
+      {
+        "id": "edge-context-llm",
+        "source": "Prompt-ContextBuilder",
+        "target": "Agent-Response",
+        "sourceHandle": "prompt",
+        "targetHandle": "input"
+      },
+      {
+        "id": "edge-llm-combine",
+        "source": "Agent-Response",
+        "target": "Combine-Results",
+        "sourceHandle": "response",
+        "targetHandle": "text1"
+      },
+      {
+        "id": "edge-combine-output",
+        "source": "Combine-Results",
+        "target": "ChatOutput-Response",
+        "sourceHandle": "combined_text",
+        "targetHandle": "message"
+      }
+    ]
+  },
+  "tags": ["file-upload", "ui", "rag", "documents", "mcp"],
+  "mcp_enabled": true,
+  "ui_components": ["File", "ChatInput", "ChatOutput"],
+  "file_upload": true
+}

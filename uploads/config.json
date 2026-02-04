@@ -1,0 +1,19 @@
+{
+  "chunk_size": 1000,
+  "chunk_overlap": 200,
+  "embedding_model": "text-embedding-3-large",
+  "vector_store": "faiss",
+  "auto_process": true,
+  "watch_folder": true,
+  "supported_extensions": [
+    ".txt", ".md", ".pdf", ".docx", ".html", ".htm",
+    ".py", ".js", ".ts", ".json", ".yaml", ".yml",
+    ".csv", ".xlsx", ".xml", ".rst"
+  ],
+  "enable_ocr": false,
+  "ocr_languages": ["eng"],
+  "max_file_size_mb": 50,
+  "deduplication": true,
+  "backup_originals": true,
+  "log_level": "INFO"
+}

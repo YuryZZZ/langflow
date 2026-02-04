@@ -1,0 +1,429 @@
+{
+  "name": "📁 Folder Upload + RAG + MCP Gateway",
+  "description": "MCP-enabled folder upload with auto-processing and RAG retrieval for Render deployment",
+  "version": "2.0.0",
+  "endpoint_name": "folder_upload_mcp",
+  "icon": "Upload",
+  "gradient": "blue",
+  "data": {
+    "nodes": [
+      {
+        "id": "ChatInput-XYZ123",
+        "type": "ChatInput",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "User Query",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "Ask about uploaded documents or type 'upload' to process files...",
+                "display_name": "Message",
+                "value": ""
+              }
+            },
+            "description": "User input for queries or upload commands"
+          }
+        }
+      },
+      {
+        "id": "MCPGateway-FileWatcher",
+        "type": "MCPTool",
+        "position": { "x": 100, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "📁 File Watcher MCP",
+            "template": {
+              "mcp_server": {
+                "type": "str",
+                "required": true,
+                "display_name": "MCP Server",
+                "value": "filesystem"
+              },
+              "tool_name": {
+                "type": "str",
+                "required": true,
+                "display_name": "Tool",
+                "value": "list_directory"
+              },
+              "parameters": {
+                "type": "dict",
+                "required": true,
+                "display_name": "Parameters",
+                "value": {
+                  "path": "uploads/documents"
+                }
+              }
+            },
+            "description": "MCP tool to watch uploads/documents folder"
+          }
+        }
+      },
+      {
+        "id": "MCPGateway-FileProcessor",
+        "type": "MCPTool",
+        "position": { "x": 350, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "⚙️ File Processor MCP",
+            "template": {
+              "mcp_server": {
+                "type": "str",
+                "required": true,
+                "display_name": "MCP Server",
+                "value": "filesystem"
+              },
+              "tool_name": {
+                "type": "str",
+                "required": true,
+                "display_name": "Tool",
+                "value": "read_file"
+              },
+              "parameters": {
+                "type": "dict",
+                "required": true,
+                "display_name": "Parameters",
+                "value": {
+                  "file_path": "{file_to_process}",
+                  "encoding": "utf-8"
+                }
+              }
+            },
+            "description": "MCP tool to read and process uploaded files"
+          }
+        }
+      },
+      {
+        "id": "MCPGateway-VectorStore",
+        "type": "MCPTool",
+        "position": { "x": 600, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "🧠 Vector Store MCP",
+            "template": {
+              "mcp_server": {
+                "type": "str",
+                "required": true,
+                "display_name": "MCP Server",
+                "value": "memory"
+              },
+              "tool_name": {
+                "type": "str",
+                "required": true,
+                "display_name": "Tool",
+                "value": "search_nodes"
+              },
+              "parameters": {
+                "type": "dict",
+                "required": true,
+                "display_name": "Parameters",
+                "value": {
+                  "query": "{user_query}",
+                  "top_k": 5
+                }
+              }
+            },
+            "description": "MCP tool to search vector store for relevant documents"
+          }
+        }
+      },
+      {
+        "id": "Agent-Orchestrator",
+        "type": "Agent",
+        "position": { "x": 850, "y": 200 },
+        "data": {
+          "node": {
+            "display_name": "🎛️ Upload Orchestrator",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "System Prompt",
+                "value": "You are the Upload Orchestrator for the Folder Upload + RAG system.\n\nYour responsibilities:\n1. Monitor uploads/documents/ folder via MCP Gateway\n2. Detect new files dropped by users\n3. Trigger file processing via MCP tools\n4. Manage vector store updates\n5. Handle user queries about uploaded documents\n\nWhen user says 'upload' or 'process files':\n- List files in uploads/documents/\n- Process each file (extract, chunk, embed)\n- Store in vector database\n- Report processing summary\n\nWhen user asks a question:\n- Use vector search to find relevant chunks\n- Synthesize answer from retrieved context\n- Cite document sources\n\nAlways be helpful and provide clear status updates."
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "display_name": "Model",
+                "value": "gpt-4o"
+              },
+              "temperature": {
+                "type": "float",
+                "required": false,
+                "display_name": "Temperature",
+                "value": 0.3
+              }
+            },
+            "description": "Main orchestrator for upload and RAG workflow"
+          }
+        }
+      },
+      {
+        "id": "Agent-DocumentAnalyzer",
+        "type": "Agent",
+        "position": { "x": 850, "y": 400 },
+        "data": {
+          "node": {
+            "display_name": "📄 Document Analyzer",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "System Prompt",
+                "value": "You are a Document Analysis Specialist.\n\nTasks:\n1. Analyze uploaded document content\n2. Extract key topics and themes\n3. Generate document summary\n4. Identify important entities\n5. Create metadata for vector storage\n\nWhen processing files:\n- Read content via MCP Gateway\n- Generate comprehensive summary\n- Extract keywords and entities\n- Prepare for chunking and embedding\n\nOutput format:\nDocument: {filename}\nType: {file_type}\nSummary: {brief_summary}\nKey Topics: {topics}\nEntities: {entities}\nChunk Count: {estimated_chunks}"
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "display_name": "Model",
+                "value": "gpt-4o-mini"
+              }
+            },
+            "description": "Analyzes documents and extracts metadata"
+          }
+        }
+      },
+      {
+        "id": "Prompt-ContextBuilder",
+        "type": "Prompt",
+        "position": { "x": 1100, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "📝 Context Builder",
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "Template",
+                "value": "## Retrieved Context from Uploaded Documents\n\n{retrieved_chunks}\n\n---\n\n## User Question\n{user_query}\n\n---\n\n## Instructions\n1. Answer based ONLY on the provided context from uploaded documents\n2. If the answer is not in the context, say \"I don't have enough information from the uploaded documents to answer that.\"\n3. Be concise but complete\n4. Cite specific document names when possible\n5. If multiple documents provide information, synthesize them\n\n## Answer:"
+              }
+            },
+            "description": "Builds prompt with retrieved document context"
+          }
+        }
+      },
+      {
+        "id": "Agent-ResponseGenerator",
+        "type": "Agent",
+        "position": { "x": 1350, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "💬 Response Generator",
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "System Prompt",
+                "value": "You are a helpful assistant that answers questions based on uploaded documents.\n\nGuidelines:\n- Use ONLY the provided context from documents\n- Be accurate and factual\n- Cite document sources when possible\n- If uncertain, acknowledge limitations\n- Provide clear, well-structured answers\n\nRemember: You are answering based on the user's uploaded documents, not general knowledge."
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "display_name": "Model",
+                "value": "gpt-4o"
+              },
+              "temperature": {
+                "type": "float",
+                "required": false,
+                "display_name": "Temperature",
+                "value": 0.2
+              }
+            },
+            "description": "Generates final response using document context"
+          }
+        }
+      },
+      {
+        "id": "CombineText-Results",
+        "type": "CombineText",
+        "position": { "x": 1600, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "📊 Result Aggregator",
+            "template": {
+              "text1": {
+                "type": "str",
+                "required": true,
+                "display_name": "Response",
+                "value": ""
+              },
+              "text2": {
+                "type": "str",
+                "required": false,
+                "display_name": "Metadata",
+                "value": "\n\n---\n*Sources: {source_documents}*"
+              }
+            },
+            "description": "Combines response with source citations"
+          }
+        }
+      },
+      {
+        "id": "ChatOutput-Final",
+        "type": "ChatOutput",
+        "position": { "x": 1850, "y": 300 },
+        "data": {
+          "node": {
+            "display_name": "💬 Response",
+            "template": {
+              "message": {
+                "type": "str",
+                "required": true,
+                "display_name": "Message",
+                "value": ""
+              }
+            },
+            "description": "Final response to user"
+          }
+        }
+      },
+      {
+        "id": "ConditionalRouter-UploadCheck",
+        "type": "ConditionalRouter",
+        "position": { "x": 350, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "🔀 Upload vs Query Router",
+            "template": {
+              "conditions": {
+                "type": "list",
+                "required": true,
+                "display_name": "Conditions",
+                "value": [
+                  {
+                    "condition": "'upload' in {input} or 'process' in {input} or 'files' in {input}",
+                    "target": "upload_workflow",
+                    "name": "Process Uploads"
+                  },
+                  {
+                    "condition": "true",
+                    "target": "query_workflow",
+                    "name": "Answer Query"
+                  }
+                ]
+              }
+            },
+            "description": "Routes to upload processing or query answering"
+          }
+        }
+      },
+      {
+        "id": "Prompt-UploadStatus",
+        "type": "Prompt",
+        "position": { "x": 600, "y": 100 },
+        "data": {
+          "node": {
+            "display_name": "📊 Upload Status",
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "display_name": "Template",
+                "value": "📁 **Folder Upload System - Status**\n\n## How to Upload Files\n\n1. **Copy files** to: `uploads/documents/` folder\n2. **Supported formats:**\n   - 📄 Documents: PDF, DOCX, TXT, MD, HTML\n   - 💻 Code: PY, JS, TS, JSON, YAML\n   - 📊 Data: CSV, XLSX\n\n3. **Processing:**\n   - Files auto-detected via MCP Gateway\n   - Text extracted and chunked\n   - Vectorized and stored in FAISS\n   - Available for RAG immediately\n\n## Current Status\n{status_details}\n\n---\n\n**Try it now:** Drop files to uploads/documents/ and type 'process files'"
+              }
+            },
+            "description": "Shows upload instructions and status"
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-input-router",
+        "source": "ChatInput-XYZ123",
+        "target": "ConditionalRouter-UploadCheck",
+        "sourceHandle": "message",
+        "targetHandle": "input"
+      },
+      {
+        "id": "edge-router-upload",
+        "source": "ConditionalRouter-UploadCheck",
+        "target": "MCPGateway-FileWatcher",
+        "sourceHandle": "upload_workflow",
+        "targetHandle": "trigger"
+      },
+      {
+        "id": "edge-router-query",
+        "source": "ConditionalRouter-UploadCheck",
+        "target": "MCPGateway-VectorStore",
+        "sourceHandle": "query_workflow",
+        "targetHandle": "query"
+      },
+      {
+        "id": "edge-watcher-processor",
+        "source": "MCPGateway-FileWatcher",
+        "target": "MCPGateway-FileProcessor",
+        "sourceHandle": "files",
+        "targetHandle": "file_to_process"
+      },
+      {
+        "id": "edge-processor-analyzer",
+        "source": "MCPGateway-FileProcessor",
+        "target": "Agent-DocumentAnalyzer",
+        "sourceHandle": "content",
+        "targetHandle": "input"
+      },
+      {
+        "id": "edge-analyzer-vector",
+        "source": "Agent-DocumentAnalyzer",
+        "target": "MCPGateway-VectorStore",
+        "sourceHandle": "chunks",
+        "targetHandle": "vectors_to_store"
+      },
+      {
+        "id": "edge-vector-context",
+        "source": "MCPGateway-VectorStore",
+        "target": "Prompt-ContextBuilder",
+        "sourceHandle": "results",
+        "targetHandle": "retrieved_chunks"
+      },
+      {
+        "id": "edge-input-context",
+        "source": "ChatInput-XYZ123",
+        "target": "Prompt-ContextBuilder",
+        "sourceHandle": "message",
+        "targetHandle": "user_query"
+      },
+      {
+        "id": "edge-context-llm",
+        "source": "Prompt-ContextBuilder",
+        "target": "Agent-ResponseGenerator",
+        "sourceHandle": "prompt",
+        "targetHandle": "input"
+      },
+      {
+        "id": "edge-llm-combine",
+        "source": "Agent-ResponseGenerator",
+        "target": "CombineText-Results",
+        "sourceHandle": "response",
+        "targetHandle": "text1"
+      },
+      {
+        "id": "edge-combine-output",
+        "source": "CombineText-Results",
+        "target": "ChatOutput-Final",
+        "sourceHandle": "combined_text",
+        "targetHandle": "message"
+      },
+      {
+        "id": "edge-watcher-status",
+        "source": "MCPGateway-FileWatcher",
+        "target": "Prompt-UploadStatus",
+        "sourceHandle": "file_list",
+        "targetHandle": "status_details"
+      },
+      {
+        "id": "edge-status-output",
+        "source": "Prompt-UploadStatus",
+        "target": "ChatOutput-Final",
+        "sourceHandle": "text",
+        "targetHandle": "message"
+      }
+    ]
+  },
+  "tags": ["mcp", "upload", "rag", "vector-store", "files"],
+  "mcp_enabled": true,
+  "mcp_servers": ["filesystem", "memory"],
+  "render_compatible": true
+}

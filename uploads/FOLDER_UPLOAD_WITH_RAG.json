@@ -1,0 +1,189 @@
+{
+  "name": "📁 Folder Upload + Auto RAG",
+  "description": "Simple folder-based file upload with automatic vectorization and RAG retrieval",
+  "data": {
+    "nodes": [
+      {
+        "id": "chat_input",
+        "type": "ChatInput",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "required": true,
+                "placeholder": "Ask about your uploaded documents...",
+                "display_name": "Message"
+              }
+            },
+            "description": "User query input"
+          }
+        }
+      },
+      {
+        "id": "file_watcher",
+        "type": "Agent",
+        "position": { "x": 100, "y": 250 },
+        "data": {
+          "node": {
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "default": "You are a file processing assistant. Monitor the uploads/documents/ folder and process any new files automatically.\n\nWhen files are detected:\n1. Extract text content\n2. Split into chunks\n3. Generate embeddings\n4. Store in vector database\n5. Return processing summary\n\nFiles are moved to uploads/processed/ after successful processing."
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "default": "gpt-4o-mini"
+              }
+            },
+            "description": "Watches folder and auto-processes files"
+          }
+        }
+      },
+      {
+        "id": "knowledge_retrieval",
+        "type": "Memory",
+        "position": { "x": 350, "y": 250 },
+        "data": {
+          "node": {
+            "template": {
+              "query": {
+                "type": "str",
+                "required": true,
+                "display_name": "Search Query"
+              },
+              "top_k": {
+                "type": "int",
+                "required": false,
+                "default": 5,
+                "display_name": "Number of Results"
+              },
+              "vector_store_path": {
+                "type": "str",
+                "required": false,
+                "default": "uploads/vector_store",
+                "display_name": "Vector Store Path"
+              }
+            },
+            "description": "Retrieves relevant chunks from uploaded documents"
+          }
+        }
+      },
+      {
+        "id": "context_builder",
+        "type": "Prompt",
+        "position": { "x": 600, "y": 250 },
+        "data": {
+          "node": {
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "default": "Context from uploaded documents:\n{retrieved_context}\n\nUser Question: {user_query}\n\nInstructions:\n- Answer based ONLY on the provided context\n- If the answer is not in the context, say \"I don't have enough information from the uploaded documents to answer that.\"\n- Be concise but complete\n- Cite specific document names when possible\n\nAnswer:"
+              }
+            },
+            "description": "Builds prompt with retrieved context"
+          }
+        }
+      },
+      {
+        "id": "llm_response",
+        "type": "Agent",
+        "position": { "x": 850, "y": 250 },
+        "data": {
+          "node": {
+            "template": {
+              "system_prompt": {
+                "type": "prompt",
+                "required": true,
+                "default": "You are a helpful assistant that answers questions based on uploaded documents. Be accurate, concise, and cite your sources when possible."
+              },
+              "model": {
+                "type": "str",
+                "required": true,
+                "default": "gpt-4o"
+              }
+            },
+            "description": "Generates final response with context"
+          }
+        }
+      },
+      {
+        "id": "status_display",
+        "type": "Prompt",
+        "position": { "x": 350, "y": 400 },
+        "data": {
+          "node": {
+            "template": {
+              "template": {
+                "type": "prompt",
+                "required": true,
+                "default": "📊 **Upload Status**\n\nTo add documents:\n1. Copy files to: `uploads/documents/`\n2. System auto-processes them\n3. Files are vectorized and stored\n4. Ask questions in the chat!\n\n**Supported formats:** PDF, DOCX, TXT, MD, HTML, CSV, and code files\n\n**Current Status:** {status_message}"
+              }
+            },
+            "description": "Shows upload instructions and status"
+          }
+        }
+      },
+      {
+        "id": "chat_output",
+        "type": "ChatOutput",
+        "position": { "x": 1100, "y": 250 },
+        "data": {
+          "node": {
+            "template": {
+              "message": {
+                "type": "str",
+                "required": true,
+                "display_name": "Response"
+              }
+            },
+            "description": "Display response to user"
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge_1",
+        "source": "chat_input",
+        "target": "knowledge_retrieval",
+        "sourceHandle": "message",
+        "targetHandle": "query"
+      },
+      {
+        "id": "edge_2",
+        "source": "knowledge_retrieval",
+        "target": "context_builder",
+        "sourceHandle": "results",
+        "targetHandle": "retrieved_context"
+      },
+      {
+        "id": "edge_3",
+        "source": "chat_input",
+        "target": "context_builder",
+        "sourceHandle": "message",
+        "targetHandle": "user_query"
+      },
+      {
+        "id": "edge_4",
+        "source": "context_builder",
+        "target": "llm_response",
+        "sourceHandle": "prompt",
+        "targetHandle": "input"
+      },
+      {
+        "id": "edge_5",
+        "source": "llm_response",
+        "target": "chat_output",
+        "sourceHandle": "response",
+        "targetHandle": "message"
+      }
+    ]
+  },
+  "tags": ["rag", "upload", "documents", "vector-store"],
+  "version": "1.0.0"
+}
