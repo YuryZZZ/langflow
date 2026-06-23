@@ -3,24 +3,32 @@ name: Jules Bridge
 on:
   issues:
     types: [opened, edited]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       task:
         description: 'Task for Jules'
         required: true
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   dispatch_jules:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'jules'))
+    if: github.event_name == 'workflow_dispatch' || (github.event.issue && contains(github.event.issue.labels.*.name, 'jules'))
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch to Jules
         env:
           JULES_API_KEY: ${{ secrets.JULES_API_KEY }}
-          TASK: ${{ github.event.inputs.task || github.event.issue.body }}
+          TASK: ${{ github.event.inputs.task || github.event.comment.body || github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           echo "Dispatching task to Jules: $TASK"
           curl -X POST "https://jules.googleapis.com/mcp/" \
             -H "Authorization: Bearer $JULES_API_KEY" \
             -H "Content-Type: application/json" \
-            -d "{\"repository\": \"${{ github.repository }}\", \"task\": \"$TASK\"}"
+            -d "{\"repository\": \"${{ github.repository }}\", \"issue_number\": \"$ISSUE_NUMBER\", \"task\": \"$TASK\"}"
