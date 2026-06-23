@@ -1,0 +1,13 @@
+name: Jules Task
+description: Dispatch Jules to work on a task for this repository
+title: 'Jules: [task name]'
+labels: ['jules']
+body:
+  - type: textarea
+    id: task_description
+    attributes:
+      label: Task Description
+      description: What do you want Jules to do?
+      placeholder: Describe the changes you want Jules to make.
+    validations:
+      required: true
