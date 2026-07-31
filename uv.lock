@@ -1883,23 +1883,22 @@ wheels = [
 
 [[package]]
 name = "datamodel-code-generator"
-version = "0.37.0"
+version = "0.64.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "argcomplete" },
-    { name = "black" },
+    { name = "black", marker = "sys_platform != 'emscripten'" },
     { name = "genson" },
     { name = "inflect" },
-    { name = "isort" },
+    { name = "isort", marker = "sys_platform != 'emscripten'" },
     { name = "jinja2" },
-    { name = "packaging" },
     { name = "pydantic" },
     { name = "pyyaml" },
-    { name = "tomli", marker = "python_full_version < '3.12'" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f1/55/13b420b719ce13d630805dc599834fb1b729a843d97775506d4685080a4b/datamodel_code_generator-0.37.0.tar.gz", hash = "sha256:7206e25f08ee2d7942a559cb8d256f51d75bbb2647d02593208350449461346a", size = 433099, upload-time = "2025-12-01T13:41:51.294Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/d2/86c94a2836ed42231653a7ddaefa0a5bc23418167a876bba7376c96b3a35/datamodel_code_generator-0.64.0.tar.gz", hash = "sha256:9c592900a00b20e416494273c22435f5a9aef6ea8c7b9190747522a60497a1cb", size = 1316440, upload-time = "2026-06-14T17:24:50.528Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/d8/41df8f9efa7cb84699c1d622df187d8cdf181600cfe8a1302a8b0778c259/datamodel_code_generator-0.37.0-py3-none-any.whl", hash = "sha256:483d8592224b21f3282541baaac3dd3f33d15c218a391d135531c9ea13557294", size = 146424, upload-time = "2025-12-01T13:41:48.766Z" },
+    { url = "https://files.pythonhosted.org/packages/23/94/71338e2f0146ac10747a5537b3a1e45256e66b7c229869eb0ee787111b41/datamodel_code_generator-0.64.0-py3-none-any.whl", hash = "sha256:b7cd8bd41a312aa997aec6150670bad781847c5b674f17e4d70e78208a0fb990", size = 374698, upload-time = "2026-06-14T17:24:48.809Z" },
 ]
 
 [[package]]
